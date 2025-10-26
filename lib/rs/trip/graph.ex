@@ -18,7 +18,7 @@ defmodule RS.Trip.Graph do
 
         # Initial parameters of the trip.
         input(:driver_id),
-        input(:customer_id),
+        input(:passenger_id),
 
         # For the purpose of this simulation, assume a 1-dimensional space, where location is a number.
         input(:pickup_location),
@@ -30,13 +30,15 @@ defmodule RS.Trip.Graph do
         # Current driver location, continuously read from the car's GPS.
         input(:driver_location_current),
 
-        # If the driver or customer cancel, record the time.
+        # If the driver or passenger cancel, record the time.
         input(:driver_cancelled_time),
-        input(:customer_cancelled_time),
+        input(:passenger_cancelled_time),
 
-        # When the driver picks up or drops off the customer, report the time.
-        input(:driver_reported_pickup_time),
-        input(:driver_reported_dropoff_time),
+        # When the driver picks up or drops off the passenger, record the time.
+        input(:picked_up),
+        compute(:driver_reported_pickup_time, [:picked_up], &record_pickup_time/1),
+        input(:dropped_off),
+        compute(:driver_reported_dropoff_time, [:dropped_off], &record_dropoff_time/1),
 
         # Periodically recomputing Pickup ETA
         schedule_recurring(
@@ -45,7 +47,7 @@ defmodule RS.Trip.Graph do
             :and,
             [
               {:driver_cancelled_time, fn x -> not provided?(x) end},
-              {:customer_cancelled_time, fn x -> not provided?(x) end},
+              {:passenger_cancelled_time, fn x -> not provided?(x) end},
               {:driver_reported_pickup_time, fn x -> not provided?(x) end},
               {:driver_reported_dropoff_time, fn x -> not provided?(x) end}
             ]
@@ -58,7 +60,7 @@ defmodule RS.Trip.Graph do
             :and,
             [
               {:driver_cancelled_time, fn x -> not provided?(x) end},
-              {:customer_cancelled_time, fn x -> not provided?(x) end},
+              {:passenger_cancelled_time, fn x -> not provided?(x) end},
               {:pickup_eta_schedule, &provided?/1},
               {:driver_reported_pickup_time, fn x -> not provided?(x) end}
             ]
@@ -73,7 +75,7 @@ defmodule RS.Trip.Graph do
             :and,
             [
               {:driver_cancelled_time, fn x -> not provided?(x) end},
-              {:customer_cancelled_time, fn x -> not provided?(x) end},
+              {:passenger_cancelled_time, fn x -> not provided?(x) end},
               {:driver_reported_pickup_time, &provided?/1},
               {:driver_reported_dropoff_time, fn x -> not provided?(x) end}
             ]
@@ -86,7 +88,7 @@ defmodule RS.Trip.Graph do
             :and,
             [
               {:driver_cancelled_time, fn x -> not provided?(x) end},
-              {:customer_cancelled_time, fn x -> not provided?(x) end},
+              {:passenger_cancelled_time, fn x -> not provided?(x) end},
               {:dropoff_eta_schedule, &provided?/1},
               {:driver_reported_dropoff_time, fn x -> not provided?(x) end}
             ]
@@ -101,7 +103,7 @@ defmodule RS.Trip.Graph do
             :and,
             [
               {:driver_cancelled_time, fn x -> not provided?(x) end},
-              {:customer_cancelled_time, fn x -> not provided?(x) end},
+              {:passenger_cancelled_time, fn x -> not provided?(x) end},
               {:driver_reported_dropoff_time, fn x -> not provided?(x) end}
             ]
           }),

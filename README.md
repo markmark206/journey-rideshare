@@ -2,7 +2,7 @@
 
 This example shows a basic rideshare workflow, built with Journey.
 
-In this example, we create a driver (Mario), and a customer (Luigi), and match them for a trip -- which starts with Mario at location 10, Luigi looking to be picked up at location 16, and dropped off at location 21.
+In this example, we create a driver (Mario), and a passenger (Luigi), and match them for a trip -- which starts with Mario at location 10, Luigi looking to be picked up at location 16, and dropped off at location 21.
 
 The log shows the trip starting and the driver driving to Luigi's pickup location.
 
@@ -14,54 +14,81 @@ Once Mario and Luigi arrive at the drop off spot, and Luigi exits the vehicle, M
 ~/src/rideshare/rs $ iex -S mix
 Erlang/OTP 27 [erts-15.2.3] [source] [64-bit] [smp:10:10] [ds:10:10:10] [async-threads:1] [jit]
 
-DEV 2025-10-26 03:33:29.321 [info] pid=<0.327.0> mfa=Ecto.Migrator.log/2  Migrations already up
+2025-10-26 12:30:55.813 Migrations already up
 Interactive Elixir (1.19.1) - press Ctrl+C to exit (type h() ENTER for help)
 iex(1)> driver = RS.Driver.new("Mario")
-"DRIVER1ZYDM1Z2J0HGG662HXX4"
-iex(2)> customer = RS.Customer.new("Luigi")
-"CUSTOMER0BZAYJLM4TGLAX62HB03"
-iex(3)> trip = RS.Trip.new(driver, customer, 10, 16, 21)
-DEV 2025-10-26 03:34:20.534 [info] pid=<0.388.0> mfa=RS.Trip.new/6  Starting a new trip.
+"DRIVERVXB7BZT2RLL9L6VBRDDM"
+iex(2)> passenger = RS.Passenger.new("Luigi")
+"PASSENGER3TMJ027H0795M8YAE3AA"
+iex(3)> trip = RS.Trip.new(driver, passenger, 10, 19, 25, 98)
+2025-10-26 12:31:33.940 Starting a new trip.
 
-Driver: DRIVER1ZYDM1Z2J0HGG662HXX4
+Driver: DRIVERVXB7BZT2RLL9L6VBRDDM
 Current Driver Location: 10
 
-Customer: CUSTOMER0BZAYJLM4TGLAX62HB03
-Pickup Location: 16
-Dropoff Location: 21
+Passenger: PASSENGER3TMJ027H0795M8YAE3AA
+Pickup Location: 19
+Dropoff Location: 25
 
-Price: $100
+Price: $98
 
-"TRIPBGRBTGDD30H7J7JGD0BG"
-DEV 2025-10-26 03:34:26.546 [info] pid=<0.438.0> mfa=RS.Trip.Logic.update_pickup_eta/1  driving to pickup location (16). pickup ETA: 6. current location: 10
-DEV 2025-10-26 03:34:31.608 [info] pid=<0.459.0> mfa=RS.Trip.Logic.update_pickup_eta/1  driving to pickup location (16). pickup ETA: 5. current location: 11
-DEV 2025-10-26 03:34:36.646 [info] pid=<0.479.0> mfa=RS.Trip.Logic.update_pickup_eta/1  driving to pickup location (16). pickup ETA: 4. current location: 12
-DEV 2025-10-26 03:34:36.665 [info] pid=<0.488.0> mfa=RS.Trip.Logic.update_pickup_eta/1  driving to pickup location (16). pickup ETA: 3. current location: 13
-DEV 2025-10-26 03:34:41.682 [info] pid=<0.500.0> mfa=RS.Trip.Logic.update_pickup_eta/1  driving to pickup location (16). pickup ETA: 3. current location: 13
-DEV 2025-10-26 03:34:41.699 [info] pid=<0.509.0> mfa=RS.Trip.Logic.update_pickup_eta/1  driving to pickup location (16). pickup ETA: 2. current location: 14
-DEV 2025-10-26 03:34:46.724 [info] pid=<0.520.0> mfa=RS.Trip.Logic.update_pickup_eta/1  driving to pickup location (16). pickup ETA: 2. current location: 14
-DEV 2025-10-26 03:34:51.769 [info] pid=<0.541.0> mfa=RS.Trip.Logic.update_pickup_eta/1  waiting for the customer at the pickup location (16).
-DEV 2025-10-26 03:34:51.792 [info] pid=<0.549.0> mfa=RS.Trip.Logic.update_pickup_eta/1  waiting for the customer at the pickup location (16).
-DEV 2025-10-26 03:34:56.819 [info] pid=<0.562.0> mfa=RS.Trip.Logic.update_pickup_eta/1  waiting for the customer at the pickup location (16).
-DEV 2025-10-26 03:35:01.861 [info] pid=<0.582.0> mfa=RS.Trip.Logic.update_pickup_eta/1  waiting for the customer at the pickup location (16).
-DEV 2025-10-26 03:35:01.871 [info] pid=<0.591.0> mfa=RS.Trip.Logic.update_pickup_eta/1  waiting for the customer at the pickup location (16).
-DEV 2025-10-26 03:35:06.913 [info] pid=<0.604.0> mfa=RS.Trip.Logic.update_pickup_eta/1  waiting for the customer at the pickup location (16).
-DEV 2025-10-26 03:35:06.932 [info] pid=<0.612.0> mfa=RS.Trip.Logic.update_pickup_eta/1  waiting for the customer at the pickup location (16).
-DEV 2025-10-26 03:35:11.952 [info] pid=<0.624.0> mfa=RS.Trip.Logic.update_pickup_eta/1  waiting for the customer at the pickup location (16).
-iex(4)> Journey.set(trip, :driver_reported_pickup_time, System.system_time(:second)); :ok
+"TRIPZY8Z221TE99GBTEY26RZ"
+2025-10-26 12:31:38.990 Driving to pickup location 19. Currently at: 10. ETA: in 9.
+2025-10-26 12:31:44.037 Driving to pickup location 19. Currently at: 11. ETA: in 8.
+2025-10-26 12:31:44.052 Driving to pickup location 19. Currently at: 12. ETA: in 7.
+2025-10-26 12:31:49.075 Driving to pickup location 19. Currently at: 12. ETA: in 7.
+2025-10-26 12:31:54.120 Driving to pickup location 19. Currently at: 14. ETA: in 5.
+2025-10-26 12:31:54.140 Driving to pickup location 19. Currently at: 15. ETA: in 4.
+2025-10-26 12:31:59.168 Driving to pickup location 19. Currently at: 15. ETA: in 4.
+2025-10-26 12:32:04.207 Driving to pickup location 19. Currently at: 17. ETA: in 2.
+2025-10-26 12:32:04.226 Driving to pickup location 19. Currently at: 18. ETA: in 1.
+2025-10-26 12:32:09.235 Driving to pickup location 19. Currently at: 18. ETA: in 1.
+2025-10-26 12:32:14.277 Waiting for passenger at pickup location 19.
+2025-10-26 12:32:19.344 Waiting for passenger at pickup location 19.
+2025-10-26 12:32:19.363 Waiting for passenger at pickup location 19.
+2025-10-26 12:32:24.402 Waiting for passenger at pickup location 19.
+iex(4)> Journey.set(trip, :picked_up, true); :ok
 :ok
-DEV 2025-10-26 03:35:22.050 [info] pid=<0.673.0> mfa=RS.Trip.Logic.update_dropoff_eta/1  transporting passenger to drop off location (21). drop off ETA: 4 (current location: 17)
-DEV 2025-10-26 03:35:27.093 [info] pid=<0.693.0> mfa=RS.Trip.Logic.update_dropoff_eta/1  transporting passenger to drop off location (21). drop off ETA: 3 (current location: 18)
-DEV 2025-10-26 03:35:32.128 [info] pid=<0.716.0> mfa=RS.Trip.Logic.update_dropoff_eta/1  transporting passenger to drop off location (21). drop off ETA: 1 (current location: 20)
-DEV 2025-10-26 03:35:32.140 [info] pid=<0.724.0> mfa=RS.Trip.Logic.update_dropoff_eta/1  waiting for the customer to exit the vehicle at the drop off location (21).
-DEV 2025-10-26 03:35:37.162 [info] pid=<0.737.0> mfa=RS.Trip.Logic.update_dropoff_eta/1  waiting for the customer to exit the vehicle at the drop off location (21).
-DEV 2025-10-26 03:35:37.180 [info] pid=<0.744.0> mfa=RS.Trip.Logic.update_dropoff_eta/1  waiting for the customer to exit the vehicle at the drop off location (21).
-DEV 2025-10-26 03:35:42.204 [info] pid=<0.757.0> mfa=RS.Trip.Logic.update_dropoff_eta/1  waiting for the customer to exit the vehicle at the drop off location (21).
-DEV 2025-10-26 03:35:42.224 [info] pid=<0.765.0> mfa=RS.Trip.Logic.update_dropoff_eta/1  waiting for the customer to exit the vehicle at the drop off location (21).
-iex(5)> Journey.set(trip, :driver_reported_dropoff_time, System.system_time(:second)); :ok
-DEV 2025-10-26 03:35:45.996 [info] pid=<0.777.0> mfa=RS.Trip.Logic.process_payment/1  customer dropped off. charging customer `CUSTOMER0BZAYJLM4TGLAX62HB03` 100, to driver `DRIVER1ZYDM1Z2J0HGG662HXX4`
+2025-10-26 12:32:32.191 Driver picked up the passenger, at #DateTime<2025-10-26 12:32:32.186429-07:00 PDT America/Los_Angeles>.
+2025-10-26 12:32:39.540 Driving passenger to drop off location 25. Currently at 20. ETA: in 5.
+2025-10-26 12:32:44.584 Driving passenger to drop off location 25. Currently at 21. ETA: in 4.
+2025-10-26 12:32:49.650 Driving passenger to drop off location 25. Currently at 22. ETA: in 3.
+2025-10-26 12:32:54.709 Driving passenger to drop off location 25. Currently at 24. ETA: in 1.
+2025-10-26 12:32:59.766 Waiting for passenger to exit the vehicle at the drop off location 25.
+2025-10-26 12:32:59.796 Waiting for passenger to exit the vehicle at the drop off location 25.
+2025-10-26 12:33:04.816 Waiting for passenger to exit the vehicle at the drop off location 25.
+2025-10-26 12:33:09.860 Waiting for passenger to exit the vehicle at the drop off location 25.
+2025-10-26 12:33:14.892 Waiting for passenger to exit the vehicle at the drop off location 25.
+2025-10-26 12:33:14.906 Waiting for passenger to exit the vehicle at the drop off location 25.
+iex(5)> Journey.set(trip, :dropped_off, true); :ok
+2025-10-26 12:33:15.822 Driver dropped off the passenger, at #DateTime<2025-10-26 12:33:15.822349-07:00 PDT America/Los_Angeles>.
 :ok
-iex(6)>
+2025-10-26 12:33:15.834 Passenger dropped off.
+Charging passenger `PASSENGER3TMJ027H0795M8YAE3AA` $98, to driver `DRIVERVXB7BZT2RLL9L6VBRDDM`.
+The trip is now complete.
+
+iex(6)> trip |> Journey.load() |> Journey.values()
+%{
+  driver_id: "DRIVERVXB7BZT2RLL9L6VBRDDM",
+  created_at: 1761507093,
+  execution_id: "TRIPZY8Z221TE99GBTEY26RZ",
+  last_updated_at: 1761507199,
+  driver_location_current: 25,
+  dropoff_location: 25,
+  passenger_id: "PASSENGER3TMJ027H0795M8YAE3AA",
+  pickup_location: 19,
+  price: 98,
+  picked_up: true,
+  driver_reported_pickup_time: 1761507152,
+  dropped_off: true,
+  driver_reported_dropoff_time: 1761507195,
+  pickup_eta_schedule: 1761507154,
+  dropoff_eta_schedule: 1761507199,
+  driver_location_current_schedule: 1761507199,
+  driver_location_current_update: "updated :driver_location_current",
+  payment: "charged $98. passenger `PASSENGER3TMJ027H0795M8YAE3AA`, driver `DRIVERVXB7BZT2RLL9L6VBRDDM`"
+}
+iex(7)>
 ```
 
 # Rs

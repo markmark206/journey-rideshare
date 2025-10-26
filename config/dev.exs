@@ -78,16 +78,7 @@ config :rs, dev_routes: true
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :default_formatter,
-  format: "DEV $date $time [$level] $metadata $message\n",
-  metadata: [
-    :user_id,
-    :pid,
-    :request_id,
-    :remote_ip,
-    :path,
-    :item_id,
-    :mfa
-  ]
+  format: "$date $time $message\n"
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.

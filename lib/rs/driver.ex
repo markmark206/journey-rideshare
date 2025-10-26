@@ -4,7 +4,7 @@ defmodule RS.Driver do
 
   @graph_name "driver"
 
-  def new(name, email \\ random_email(@graph_name <> "-"), timezone \\ "America/New_York") do
+  def new(name, email \\ random_email(@graph_name <> "-"), timezone \\ "America/Los_Angeles") do
     driver =
       graph()
       |> Journey.start_execution()
