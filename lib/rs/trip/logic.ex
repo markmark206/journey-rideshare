@@ -21,15 +21,14 @@ defmodule RS.Trip.Logic do
     eta = ask_navigation_subsystem_for_eta(driver_location_current, pickup_location)
 
     Logger.info(
-      "driving to pickup location (#{pickup_location}). pickup ETA: #{eta}. current location: #{driver_location_current}"
+      "Driving to pickup location #{pickup_location}. Currently at: #{driver_location_current}. ETA: in #{eta}."
     )
 
     {:ok, eta}
   end
 
   def update_pickup_eta(%{pickup_location: pickup_location}) do
-    Logger.info("waiting for the customer at the pickup location (#{pickup_location}).")
-
+    Logger.info("Waiting for passenger at pickup location #{pickup_location}.")
     {:ok, 0}
   end
 
@@ -41,22 +40,19 @@ defmodule RS.Trip.Logic do
     eta = ask_navigation_subsystem_for_eta(driver_location_current, dropoff_location)
 
     Logger.info(
-      "transporting passenger to drop off location (#{dropoff_location}). drop off ETA: #{eta} (current location: #{driver_location_current})"
+      "Driving passenger to drop off location #{dropoff_location}. Currently at #{driver_location_current}. ETA: in #{eta}."
     )
 
     {:ok, eta}
   end
 
   def update_dropoff_eta(%{dropoff_location: dropoff_location}) do
-    Logger.info(
-      "waiting for the customer to exit the vehicle at the drop off location (#{dropoff_location})."
-    )
-
+    Logger.info("Waiting for passenger to exit the vehicle at the drop off location #{dropoff_location}.")
     {:ok, 0}
   end
 
   def fetch_simulated_current_location(%{driver_reported_pickup_time: _} = values) do
-    # The customer has been picked up, so we are driving to the drop off location.
+    # The passenger has been picked up, so we are driving to the drop off location.
     last_position = Map.get(values, :driver_location_current)
 
     new_position =
@@ -71,7 +67,7 @@ defmodule RS.Trip.Logic do
   end
 
   def fetch_simulated_current_location(values) do
-    # The customer has not been picked up, so we are driving to the pickup location.
+    # The passenger has not been picked up, so we are driving to the pickup location.
     last_position = Map.get(values, :driver_location_current)
 
     new_position =
@@ -85,15 +81,27 @@ defmodule RS.Trip.Logic do
     {:ok, new_position}
   end
 
-  def process_payment(%{customer_id: customer_id, driver_id: driver_id, price: price}) do
-    Logger.info(
-      "customer dropped off. charging customer `#{customer_id}` #{price}, to driver `#{driver_id}`"
-    )
+  def process_payment(%{passenger_id: passenger_id, driver_id: driver_id, price: price}) do
+    Logger.info("""
+    Passenger dropped off.
+    Charging passenger `#{passenger_id}` $#{price}, to driver `#{driver_id}`.
+    The trip is now complete.
+    """)
 
-    {:ok, "charged"}
+    {:ok, "charged $#{price}. passenger `#{passenger_id}`, driver `#{driver_id}`"}
   end
 
   def now(_) do
+    {:ok, System.system_time(:second)}
+  end
+
+  def record_pickup_time(_) do
+    Logger.info("Driver picked up the passenger, at #{inspect(DateTime.now!("America/Los_Angeles"))}.")
+    {:ok, System.system_time(:second)}
+  end
+
+  def record_dropoff_time(_) do
+    Logger.info("Driver dropped off the passenger, at #{inspect(DateTime.now!("America/Los_Angeles"))}.")
     {:ok, System.system_time(:second)}
   end
 end

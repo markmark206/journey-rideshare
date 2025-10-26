@@ -1,12 +1,12 @@
-defmodule RS.Customer do
+defmodule RS.Passenger do
   import Journey.Node
 
   import RS.Helpers
 
-  @graph_name "customer"
+  @graph_name "passenger"
 
-  def new(name, email \\ random_email(@graph_name <> "-"), timezone \\ "America/New_York") do
-    customer =
+  def new(name, email \\ random_email(@graph_name <> "-"), timezone \\ "America/Los_Angeles") do
+    passenger =
       graph()
       |> Journey.start_execution()
       |> Journey.set(%{
@@ -15,7 +15,7 @@ defmodule RS.Customer do
         timezone: timezone
       })
 
-    customer.id
+    passenger.id
   end
 
   def find_by_email(email) do

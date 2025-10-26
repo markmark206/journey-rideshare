@@ -3,7 +3,7 @@ defmodule RS.Trip do
 
   def new(
         driver_id,
-        customer_id,
+        passenger_id,
         driver_location,
         pickup_location,
         dropoff_location,
@@ -17,7 +17,7 @@ defmodule RS.Trip do
     Driver: #{driver_id}
     Current Driver Location: #{driver_location}
 
-    Customer: #{customer_id}
+    Passenger: #{passenger_id}
     Pickup Location: #{pickup_location}
     Dropoff Location: #{dropoff_location}
 
@@ -29,7 +29,7 @@ defmodule RS.Trip do
       |> Journey.start_execution()
       |> Journey.set(%{
         driver_id: driver_id,
-        customer_id: customer_id,
+        passenger_id: passenger_id,
         driver_location_current: driver_location,
         pickup_location: pickup_location,
         dropoff_location: dropoff_location,
