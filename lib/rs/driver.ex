@@ -41,6 +41,12 @@ defmodule RS.Driver do
         input(:email),
         input(:name),
         input(:timezone)
+        # ...
+        # various other driver attributes and computations, such as
+        # - user preferences and information
+        # - driver rating and reviews
+        # - periodic reports and notifications (e.g. weekly earning reports, reminders to renew registration, etc.)
+        # ...
       ],
       execution_id_prefix: @graph_name
     )

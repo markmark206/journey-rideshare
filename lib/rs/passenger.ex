@@ -42,6 +42,12 @@ defmodule RS.Passenger do
         input(:email),
         input(:name),
         input(:timezone)
+        # ...
+        # various other passenger attributes and computations, such as
+        # - user preferences and information
+        # - reminders to ride a certain time period after the last trip,
+        # - reminders to update payment information if close to expiration,
+        # ...
       ],
       execution_id_prefix: @graph_name
     )

@@ -1,12 +1,23 @@
-## Rideshare Workflow Demo
+## Rideshare Trip Workflow Demo
 
-This example shows a basic rideshare workflow, built with Journey.
+This example models a basic rideshare trip workflow -- driving to pickup location, passenger pickup, driving to destination, passenger drop off, payment.
+
+The definition of the workflow can be found in [lib/rs/trip/graph.ex](./lib/rs/trip/graph.ex), and the example below illustrates running an execution of this workflow, which gets created once the drivver and the passenger get matched.
+
+The workflow is built with [Journey](https://hexdocs.pm/journey), an Elixir package for defining and executing Persisted Distributed Reactive Graphs, so I didn't need to write much code for
+* persistence (db schemas),
+* scheduling one-time and recurring tasks,
+* orchestrating conditional events and dependencies,
+* structuring the code of orchestration logic and computations,
+* retries and crash recovery,
+* distribution and horizontal scalability.
+while keeping the application concise, self-documented (see the graph), and naturally scalable – resilient, durable executions in a package. When / if we wire up LiveView UI for managing trips, we can use Journey's [f_on_save](https://hexdocs.pm/journey/search.html?q=f_on_save) functions generate PubSub notifications, to trigger UI updates.
 
 In this example, we create a driver (Mario), and a passenger (Luigi), and match them for a trip -- which starts with Mario at location 10, Luigi looking to be picked up at location 16, and dropped off at location 21.
 
 The log shows the trip starting and the driver driving to Luigi's pickup location.
 
-Once Luigi is picked up, the driver takes Luigi to the drop off spot -- the logs show the tracking of similated GPS data.
+Once Luigi is picked up, the driver takes Luigi to the drop off spot -- the logs show the tracking of simulated GPS data.
 
 Once Mario and Luigi arrive at the drop off spot, and Luigi exits the vehicle, Mario marks the passenger as dropped off, thus completing the trip, and triggering the payment.
 
