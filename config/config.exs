@@ -8,7 +8,7 @@
 import Config
 
 config :rs,
-  ecto_repos: [Rs.Repo],
+  ecto_repos: [Rs.Repo, Journey.Repo],
   generators: [timestamp_type: :utc_datetime]
 
 # Configures the endpoint

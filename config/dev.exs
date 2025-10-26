@@ -10,6 +10,16 @@ config :rs, Rs.Repo,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 
+config :journey, Journey.Repo,
+  username: "postgres",
+  password: "postgres",
+  hostname: "localhost",
+  database: "rs_journey_dev",
+  stacktrace: true,
+  show_sensitive_data_on_connection_error: true,
+  pool_size: 10,
+  log: false
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #
@@ -67,7 +77,17 @@ config :rs, RsWeb.Endpoint,
 config :rs, dev_routes: true
 
 # Do not include metadata nor timestamps in development logs
-config :logger, :default_formatter, format: "[$level] $message\n"
+config :logger, :default_formatter,
+  format: "DEV $date $time [$level] $metadata $message\n",
+  metadata: [
+    :user_id,
+    :pid,
+    :request_id,
+    :remote_ip,
+    :path,
+    :item_id,
+    :mfa
+  ]
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
@@ -75,6 +95,10 @@ config :phoenix, :stacktrace_depth, 20
 
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
+
+config :journey, log_level: :warning
+# config :journey, log_level: :info
+config :journey, :background_sweeper, period_seconds: 5
 
 config :phoenix_live_view,
   # Include debug annotations and locations in rendered markup.

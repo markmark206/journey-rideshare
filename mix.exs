@@ -59,10 +59,12 @@ defmodule Rs.MixProject do
        compile: false,
        depth: 1},
       {:swoosh, "~> 1.16"},
+      {:nanoid, "~> 2.1.0"},
       {:req, "~> 0.5"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 0.26"},
+      {:journey, github: "markmark206/journey", branch: "main"},
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"}
@@ -78,8 +80,12 @@ defmodule Rs.MixProject do
   defp aliases do
     [
       setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
-      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
-      "ecto.reset": ["ecto.drop", "ecto.setup"],
+      "ecto.setup": [
+        "ecto.create -r Journey.Repo -r Rs.Repo",
+        "ecto.migrate -r Journey.Repo -r Rs.Repo",
+        "run priv/repo/seeds.exs"
+      ],
+      "ecto.reset": ["ecto.drop -r Journey.Repo -r Rs.Repo", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["compile", "tailwind rs", "esbuild rs"],
