@@ -10,7 +10,8 @@ The workflow is built with [Journey](https://hexdocs.pm/journey), an Elixir pack
 * orchestrating conditional events and dependencies,
 * structuring the code of orchestration logic and computations,
 * retries and crash recovery,
-* distribution and horizontal scalability.
+* distribution and horizontal scalability,
+
 while keeping the application concise, self-documented (see the graph), and naturally scalable – resilient, durable executions in a package. When / if we wire up LiveView UI for managing trips, we can use Journey's [f_on_save](https://hexdocs.pm/journey/search.html?q=f_on_save) functions generate PubSub notifications, to trigger UI updates.
 
 In this example, we create a driver (Mario), and a passenger (Luigi), and match them for a trip -- which starts with Mario at location 10, Luigi looking to be picked up at location 16, and dropped off at location 21.
