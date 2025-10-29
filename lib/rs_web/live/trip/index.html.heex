@@ -46,7 +46,6 @@
 
       <RsWeb.Live.Components.TripCard.render trip_values={@trip_values} trip={@trip} />
 
-      
       <div :if={@trip_values.trip_history != nil and @show_details} class={section2()}>
         History:
         <%= for %{"node" => node, "timestamp" => timestamp, "value" => value} <- @trip_values.trip_history |> Enum.reverse() do %>

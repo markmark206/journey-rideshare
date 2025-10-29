@@ -1,14 +1,17 @@
 <div class={if @embedded?, do: "space-y-6", else: "mx-auto max-w-2xl space-y-6"}>
   <div :if={@connected?} class="space-y-4">
-
-    <RsWeb.Live.Components.TripCard.render :if={@trip_values != nil and @embedded?} trip_values={@trip_values} trip={@trip} embedded={true}/>
+    <RsWeb.Live.Components.TripCard.render
+      :if={@trip_values != nil and @embedded?}
+      trip_values={@trip_values}
+      trip={@trip}
+      embedded={true}
+    />
     <div
       :if={@trip_values != nil and not @embedded?}
       id={"trip-status-#{@trip}-id"}
       class={section()}
     >
-
-    <RsWeb.Live.Components.TripCard.render trip_values={@trip_values} trip={@trip} embedded={false}/>
+      <RsWeb.Live.Components.TripCard.render trip_values={@trip_values} trip={@trip} embedded={false} />
 
       <div :if={@show_details} class={section2()}>
         <div class={list_element()}>Driver: <span class={data_point_no_border()}>{@trip_values.driver_id}</span></div>
@@ -29,8 +32,6 @@
         </div>
       </div>
 
-
-      
       <div :if={@trip_values.trip_history != nil and @show_details} class={section2()}>
         History:
         <%= for %{"node" => node, "timestamp" => timestamp, "value" => value} <- @trip_values.trip_history |> Enum.reverse() do %>

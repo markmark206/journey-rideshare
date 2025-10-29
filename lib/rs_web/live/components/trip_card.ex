@@ -84,51 +84,93 @@ defmodule RsWeb.Live.Components.TripCard do
         </div>
 
         <div class="font-mono my-1 py-1">
-          <span class="font-mono badge badge-neutral">
-            <.icon name="hero-map" class="w-4 h-4" /> {@trip_values.location_driver}
-          </span>
-          <span :if={@trip_values.trip_completed_at != nil} class="font-mono badge badge-neutral">
-            <.icon name="hero-clock" class="w-4 h-4" />{@trip_values.trip_completed_at - @trip_values.created_at}s
-          </span>
-          <span :if={@trip_values.trip_completed_at == nil} class="font-mono badge badge-neutral">
-            <.icon name="hero-clock" class="w-4 h-4" />{@trip_values.last_updated_at - @trip_values.created_at}s
-          </span>
+          <div class="dropdown dropdown-top inline-block">
+            <label tabindex="0">
+              <span class="font-mono badge badge-neutral">
+                <.icon name="hero-map" class="w-4 h-4" /> {@trip_values.location_driver}
+              </span>
+            </label>
+            <div tabindex="0" class="dropdown-content z-[1] p-3 shadow bg-base-200 rounded-box mb-1 min-w-[200px]">
+              <p class="text-sm">
+                {if @trip_values.trip_completed_at != nil, do: "Last known location", else: "Current driver location"}
+              </p>
+            </div>
+          </div>
+          <div class="dropdown dropdown-top inline-block">
+            <label tabindex="0">
+              <span :if={@trip_values.trip_completed_at != nil} class="font-mono badge badge-neutral">
+                <.icon name="hero-clock" class="w-4 h-4" />{@trip_values.trip_completed_at - @trip_values.created_at}s
+              </span>
+              <span :if={@trip_values.trip_completed_at == nil} class="font-mono badge badge-neutral">
+                <.icon name="hero-clock" class="w-4 h-4" />{@trip_values.last_updated_at - @trip_values.created_at}s
+              </span>
+            </label>
+            <div tabindex="0" class="dropdown-content z-[1] p-3 shadow bg-base-200 rounded-box mb-1 min-w-[200px]">
+              <p class="text-sm">Trip duration</p>
+            </div>
+          </div>
           <div
             :if={@trip_values.waiting_for_passenger_at_pickup == true and @trip_values.trip_completed_at == nil}
             class="font-mono badge badge-info"
           >
             Waiting for Passenger at pickup location.
           </div>
-          <div
-            :if={@trip_values.picked_up == true}
-            class="font-mono badge badge-neutral"
-          >
-            Picked Up
+          <div :if={@trip_values.picked_up == true} class="dropdown dropdown-top inline-block">
+            <label tabindex="0">
+              <div class="font-mono badge badge-neutral">
+                Picked Up
+              </div>
+            </label>
+            <div tabindex="0" class="dropdown-content z-[1] p-3 shadow bg-base-200 rounded-box mb-1 min-w-[200px]">
+              <p class="text-sm">The passenger was picked up</p>
+            </div>
+          </div>
+          <div :if={@trip_values.dropped_off == true} class="dropdown dropdown-top inline-block">
+            <label tabindex="0">
+              <div class="font-mono badge badge-neutral">
+                Dropped Off
+              </div>
+            </label>
+            <div tabindex="0" class="dropdown-content z-[1] p-3 shadow bg-base-200 rounded-box mb-1 min-w-[200px]">
+              <p class="text-sm">The passenger was dropped off</p>
+            </div>
           </div>
           <div
-            :if={@trip_values.dropped_off == true}
-            class="font-mono badge badge-neutral"
-          >
-            Dropped Off
-          </div>
-          <span
             :if={@trip_values.done_waiting_for_passenger_at_pickup != nil and @trip_values.trip_completed_at != nil}
-            class="font-mono badge badge-warning"
+            class="dropdown dropdown-top inline-block"
           >
-            Passenger no show
-          </span>
+            <label tabindex="0">
+              <span class="font-mono badge badge-warning">
+                Passenger no show
+              </span>
+            </label>
+            <div tabindex="0" class="dropdown-content z-[1] p-3 shadow bg-base-200 rounded-box mb-1 min-w-[200px]">
+              <p class="text-sm">Passenger did not show up</p>
+            </div>
+          </div>
 
           <span :if={@trip_values.waiting_for_passenger_at_dropoff == true} class="font-mono badge badge-info">
             ⌛️ Waiting for Passenger to exit.
           </span>
-          <span :if={@trip_values.done_waiting_for_passenger_to_leave != nil} class="font-mono badge badge-neutral">
-            👋
-          </span>
-          <div
-            :if={@trip_values.payment != nil}
-            class="font-mono badge badge-neutral"
-          >
-            Paid
+          <div :if={@trip_values.done_waiting_for_passenger_to_leave != nil} class="dropdown dropdown-top inline-block">
+            <label tabindex="0">
+              <span class="font-mono badge badge-neutral">
+                👋
+              </span>
+            </label>
+            <div tabindex="0" class="dropdown-content z-[1] p-3 shadow bg-base-200 rounded-box mb-1 min-w-[200px]">
+              <p class="text-sm">The passenger was asked to leave the car</p>
+            </div>
+          </div>
+          <div :if={@trip_values.payment != nil} class="dropdown dropdown-top inline-block">
+            <label tabindex="0">
+              <div class="font-mono badge badge-neutral">
+                Paid
+              </div>
+            </label>
+            <div tabindex="0" class="dropdown-content z-[1] p-3 shadow bg-base-200 rounded-box mb-1 min-w-[200px]">
+              <p class="text-sm">Payment was collected</p>
+            </div>
           </div>
           <.link
             :if={@embedded}
