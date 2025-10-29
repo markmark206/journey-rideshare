@@ -1,30 +1,15 @@
-<div class="mx-auto max-w-2xl space-y-6">
+<div class={if @embedded?, do: "space-y-6", else: "mx-auto max-w-2xl space-y-6"}>
   <div :if={@connected?} class="space-y-4">
-    <div :if={false}>
-      <.button
-        id="start-a-new-trip"
-        phx-click="start_trip"
-        class="btn btn-sm btn-success my-5 py-5 max-w-2xl "
-      >
-        Start a New Trip
-      </.button>
-    </div>
+
+    <RsWeb.Live.Components.TripCard.render :if={@trip_values != nil and @embedded?} trip_values={@trip_values} trip={@trip} embedded={true}/>
     <div
-      :if={@trip_values != nil}
+      :if={@trip_values != nil and not @embedded?}
       id={"trip-status-#{@trip}-id"}
       class={section()}
     >
-      <h1 class={[section_title(), "flex items-center"]}>
-        <span>Trip <span class={data_point()}>{@trip}</span></span>
-        <span :if={@trip_values.trip_completed_at == nil} class="ml-auto flex items-center gap-2">
-          <span>in progress</span>
-          <span class="font-mono status status-success status-md animate-ping"></span>
-        </span>
-        <span :if={@trip_values.trip_completed_at != nil} class="ml-auto flex items-center gap-2">
-          <span>completed</span>
-          <span class="font-mono status status-md"></span>
-        </span>
-      </h1>
+
+    <RsWeb.Live.Components.TripCard.render trip_values={@trip_values} trip={@trip} embedded={false}/>
+
       <div :if={@show_details} class={section2()}>
         <div class={list_element()}>Driver: <span class={data_point_no_border()}>{@trip_values.driver_id}</span></div>
         <div class={list_element()}>
@@ -44,7 +29,6 @@
         </div>
       </div>
 
-      <RsWeb.Live.Components.TripCard.render trip_values={@trip_values} trip={@trip} />
 
       
       <div :if={@trip_values.trip_history != nil and @show_details} class={section2()}>
@@ -138,7 +122,7 @@
       </div>
     </div>
     <div
-      :if={@trip_values != nil and false}
+      :if={@trip_values != nil and @show_details}
       id={"trip-values-#{@trip}-id"}
       class={section()}
     >

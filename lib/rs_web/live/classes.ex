@@ -22,4 +22,12 @@ defmodule RsWeb.Live.Classes do
   def section2() do
     "text-sm font-mono border-1 rounded-md m-3 p-4 bg-base-100"
   end
+
+  def section2_no_margin() do
+    "text-sm font-mono border-1 rounded-md p-4 bg-base-100"
+  end
+
+  def section_no_border() do
+    "text-sm font-mono m-3 p-4 bg-base-100"
+  end
 end

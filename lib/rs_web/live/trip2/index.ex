@@ -1,4 +1,4 @@
-defmodule RsWeb.Live.Trip.Index do
+defmodule RsWeb.Live.Trip2.Index do
   use RsWeb, :live_view
 
   import RsWeb.Live.Classes
@@ -8,12 +8,14 @@ defmodule RsWeb.Live.Trip.Index do
     Logger.info("Mounting RSWeb.Live.Trip.Index LiveView #{inspect(params)}")
 
     connected? = connected?(socket)
+    embedded? = not is_map(params)
 
     show_details = is_map(params) and false != Map.get(params, "show_details", false)
 
     socket =
       assign(socket, connected?: connected?)
       |> assign(show_details: show_details)
+      |> assign(embedded?: embedded?)
       |> mount_with_connected(params, session, connected?)
 
     {:ok, socket}
@@ -123,12 +125,12 @@ defmodule RsWeb.Live.Trip.Index do
   end
 
   def handle_info({:trip_updated, trip}, socket) do
-    Logger.info("Handling trip update #{trip}")
+    Logger.info("#{trip}: Handling trip update")
     {:noreply, load_trip_to_socket_assigns(socket, trip)}
   end
 
   def load_trip_to_socket_assigns(socket, trip) when trip == nil do
-    Logger.debug("Loading trip #{trip} to socket assigns")
+    Logger.debug("#{trip}: Loading trip to socket assigns")
 
     socket
     |> assign(:driver, nil)
@@ -139,7 +141,7 @@ defmodule RsWeb.Live.Trip.Index do
   end
 
   def load_trip_to_socket_assigns(socket, trip) when trip != nil do
-    Logger.debug("Loading trip #{trip} to socket assigns")
+    Logger.info("#{trip}: Loading trip to socket assigns")
     trip_values = Journey.load(trip) |> Journey.values(include_unset_as_nil: true)
     # Journey.Tools.summarize_as_text(trip)
     trip_summary = nil

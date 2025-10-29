@@ -17,9 +17,9 @@ defmodule RsWeb.Router do
   scope "/", RsWeb do
     pipe_through :browser
 
-    # live "/", Live.Home.Index
-    live "/", Live.Trip.Index
-    live "/trip/:trip", Live.Trip.Index
+    live "/", Live.Home.Index
+    # live "/", Live.Trip.Index
+    live "/trip/:trip", Live.Trip2.Index
     # get "/", PageController, :home
   end
 
