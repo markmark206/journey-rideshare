@@ -77,8 +77,7 @@ config :rs, RsWeb.Endpoint,
 config :rs, dev_routes: true
 
 # Do not include metadata nor timestamps in development logs
-config :logger, :default_formatter,
-  format: "$date $time $message\n"
+config :logger, :default_formatter, format: "$date $time $message\n"
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.

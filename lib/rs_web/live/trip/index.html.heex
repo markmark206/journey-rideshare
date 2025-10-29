@@ -1,0 +1,216 @@
+<div class="mx-auto max-w-2xl space-y-6">
+  <div :if={@connected?} class="space-y-4">
+    <div>
+      <.button
+        id="start-a-new-trip"
+        phx-click="start_trip"
+        class="btn btn-sm btn-success my-5 py-5 w-full"
+      >
+        Start a New Trip
+      </.button>
+    </div>
+    <div
+      :if={@trip_values != nil}
+      id={"trip-status-#{@trip}-id"}
+      class={section()}
+    >
+      <h1 class={section_title()}>Trip <span class={data_point()}>{@trip}</span></h1>
+      <div class={section2()}>
+        <div class={list_element()}>Driver: <span class={data_point_no_border()}>{@trip_values.driver_id}</span></div>
+        <div class={list_element()}>
+          Passenger: <span class={data_point_no_border()}>{@trip_values.passenger_id}</span>
+        </div>
+        <div class={list_element()}>
+          Starting point: <span class={data_point_no_border()}>{@trip_values.location_driver_initial}</span>
+        </div>
+        <div class={list_element()}>
+          Pickup point: <span class={data_point_no_border()}>{@trip_values.location_pickup}</span>
+        </div>
+        <div class={list_element()}>
+          Dropoff point: <span class={data_point_no_border()}>{@trip_values.location_dropoff}</span>
+        </div>
+        <div class={list_element()}>
+          Price: <span class={data_point_no_border()}>${@trip_values.price}</span>
+        </div>
+      </div>
+
+      <div class={section2()}>
+        <div class="text-xs font-mono">
+          <%= for i <- @trip_values.location_driver_initial..@trip_values.location_dropoff do %>
+            <% marker =
+              cond do
+                i == @trip_values.location_pickup and @trip_values.done_waiting_for_passenger_at_pickup != nil -> "?"
+                i == @trip_values.location_pickup and @trip_values.picked_up == true -> "o"
+                i == @trip_values.location_pickup and @trip_values.picked_up != true -> "🧍"
+                i == @trip_values.location_dropoff and @trip_values.dropped_off == true -> "🧍"
+                i == @trip_values.location_dropoff and @trip_values.dropped_off != true -> "📍"
+                true -> "."
+              end %>
+            <span class="font-mono">{marker}</span>
+          <% end %>
+        </div>
+        <div class="text-xs font-mono">
+          <%= for i <- @trip_values.location_driver_initial..@trip_values.location_dropoff do %>
+            <% marker =
+              cond do
+                i == @trip_values.location_driver and @trip_values.trip_completed_at == nil -> "🚗"
+                i == @trip_values.location_driver and @trip_values.trip_completed_at != nil -> "."
+                true -> "."
+              end %>
+            <span class="font-mono">{marker}</span>
+          <% end %>
+        </div>
+        <div class="mt-1 pt-1">
+          <.button
+            disabled={
+              @trip_values.picked_up == true or @trip_values.waiting_for_passenger_at_pickup != true or
+                @trip_values.trip_completed_at != nil
+            }
+            id={"pickup-passenger1-#{@trip}"}
+            phx-click="pickup_customer"
+            phx-value-trip={@trip}
+            class="btn btn-sm btn-success my-2 py-2"
+          >
+            Picked Up
+          </.button>
+          <.button
+            disabled={@trip_values.waiting_for_passenger_at_dropoff != true or @trip_values.trip_completed_at != nil}
+            id={"drop-off-passenger1-#{@trip}"}
+            phx-click="dropoff_customer"
+            phx-value-trip={@trip}
+            class="btn btn-sm btn-success my-2 py-2"
+          >
+            Dropped Off
+          </.button>
+        </div>
+
+        <div class="font-mono my-1 py-1">
+          <span class="font-mono badge badge-accent">{@trip_values.location_driver}</span>
+          <span :if={@trip_values.trip_completed_at != nil} class="font-mono badge badge-accent">
+            {@trip_values.trip_completed_at - @trip_values.created_at}s
+          </span>
+          <span :if={@trip_values.trip_completed_at == nil} class="font-mono badge badge-accent">
+            {@trip_values.last_updated_at - @trip_values.created_at}s
+          </span>
+          <span :if={@trip_values.done_waiting_for_passenger_at_pickup != nil} class="font-mono badge badge-accent">
+            Passenger did not show up.
+          </span>
+
+          <span :if={@trip_values.waiting_for_passenger_at_dropoff == true}>
+            ⌛️ Waiting for Passenger to exit.
+          </span>
+          <span :if={@trip_values.done_waiting_for_passenger_to_leave != nil} class="font-mono badge badge-accent">
+            👋
+          </span>
+          <span :if={@trip_values.payment != nil} class="font-mono badge badge-accent">${@trip_values.price}</span>
+        </div>
+      </div>
+      <div :if={@trip_values.trip_history != nil} class={section2()}>
+        History:
+        <%= for %{"node" => node, "timestamp" => timestamp, "value" => value} <- @trip_values.trip_history |> Enum.reverse() do %>
+          <div class="text-sm font-mono">{timestamp}: [{node}] {value}</div>
+        <% end %>
+      </div>
+
+      <div :if={false} class={section2()}>
+        <div id={"current-status-#{@trip}-id"}>
+          Current status: <span class="font-mono badge badge-accent">{@trip_values.current_status}</span>
+        </div>
+        <div>
+          Current location:
+          <span class={data_point_no_border()}>
+            {@trip_values.location_driver} ({@trip_values.current_location_label})
+          </span>
+        </div>
+
+        <div :if={@trip_values.waiting_for_passenger_at_pickup != nil} class={list_element()}>
+          Waiting for Passenger
+        </div>
+
+        <div :if={@trip_values.done_waiting_for_passenger_at_pickup != nil} class={list_element()}>
+          Passenger did not show up
+        </div>
+        <div :if={@trip_values.picked_up == true} class={list_element()}>Passenger picked up</div>
+
+        <div :if={@trip_values.waiting_for_passenger_at_dropoff == true} class={list_element()}>
+          Waiting for Passenger to exit the car at dropoff.
+        </div>
+
+        <div :if={@trip_values.done_waiting_for_passenger_to_leave != nil} class={list_element()}>
+          Passenger didn't want to leave, and had to be asked to leave.
+        </div>
+
+        <div :if={@trip_values.dropped_off == true} class={list_element()}>Passenger dropped off</div>
+        <div :if={@trip_values.payment != nil} class={list_element()}>Payment collected</div>
+
+        <div :if={
+          @trip_values.trip_completed_at == nil and
+            @trip_values.trip_completed_at == nil and
+            @trip_values.picked_up != true and
+            @trip_values.current_location_label == "pickup point"
+        }>
+          <.button
+            id={"pickup-passenger-#{@trip}"}
+            phx-click="pickup_customer"
+            phx-value-trip={@trip}
+            class="btn btn-sm btn-success m-2 p-2"
+          >
+            Pick Up Passenger
+          </.button>
+        </div>
+
+        <div :if={
+          @trip_values.trip_completed_at == nil and
+            @trip_values.dropped_off != true and
+            @trip_values.current_location_label == "drop off point"
+        }>
+          <.button
+            id={"drop-off-passenger-#{@trip}"}
+            phx-click="dropoff_customer"
+            phx-value-trip={@trip}
+            class="btn btn-sm btn-success m-2 p-2"
+          >
+            Drop Off Passenger
+          </.button>
+        </div>
+        <div :if={@trip_values.trip_completed_at != nil}>This trip has completed.</div>
+      </div>
+    </div>
+
+    <div
+      :if={@trip_values != nil and false}
+      id={"trip-status-#{@trip}-id"}
+      class={section()}
+    >
+      <h1 class={section_title()}>History</h1>
+      <div :if={@trip_values.trip_history != nil} class={section2()}>
+        <%= for %{"node" => node, "timestamp" => timestamp, "value" => value} <- @trip_values.trip_history |> Enum.reverse() do %>
+          <div class="text-sm font-mono">{timestamp}: [{node}] {value}</div>
+        <% end %>
+      </div>
+      <div :if={false}>
+        <div class={section_title()}>Raw History</div>
+        <div class={section2()}>
+          <pre class="whitespace-pre-wrap break-words">{inspect(@trip_values.trip_history, pretty: true)}</pre>
+        </div>
+      </div>
+    </div>
+    <div
+      :if={@trip_values != nil and false}
+      id={"trip-values-#{@trip}-id"}
+      class={section()}
+    >
+      <h1 class={section_title()}>Raw Trip Values</h1>
+      <div class={section2()}>
+        <pre class="whitespace-pre-wrap break-words">{"#{inspect(@trip_values, pretty: true)}"}</pre>
+      </div>
+    </div>
+
+    <div
+      :if={@trip_summary != nil}
+      class="border-1 rounded-md p-4 bg-base-100 text-xs whitespace-pre-wrap break-words"
+    >
+      <pre class="whitespace-pre-wrap break-words">{@trip_summary}</pre>
+    </div>
+  </div>
+</div>

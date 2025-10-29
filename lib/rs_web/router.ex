@@ -17,7 +17,10 @@ defmodule RsWeb.Router do
   scope "/", RsWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    # live "/", Live.Home.Index
+    live "/", Live.Trip.Index
+    live "/trip/:trip", Live.Trip.Index
+    # get "/", PageController, :home
   end
 
   # Other scopes may use custom stacks.

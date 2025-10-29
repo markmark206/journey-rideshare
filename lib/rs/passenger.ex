@@ -33,7 +33,7 @@ defmodule RS.Passenger do
     end
   end
 
-  defp graph() do
+  def graph() do
     Journey.new_graph(
       @graph_name,
       "v1.0",
