@@ -142,7 +142,7 @@ defmodule RS.Trip.Logic do
     {:ok, System.system_time(:second)}
   end
 
-  def record_driver_cancelled_time_after_waiting_for_passenger_at_pickup(%{execution_id: execution_id}) do
+  def record_driver_cancelled_time_after_waiting_for_food_at_restaurant(%{execution_id: execution_id}) do
     Logger.info(
       "#{execution_id}: Driver cancelled the trip after waiting for passenger at pickup location for 5 minutes, at #{inspect(DateTime.now!("America/Los_Angeles"))}."
     )
@@ -158,7 +158,7 @@ defmodule RS.Trip.Logic do
     {:ok, true}
   end
 
-  def driver_at_pickup_location(%{
+  def driver_at_restaurant(%{
         location_driver: location_driver,
         location_pickup: location_pickup,
         execution_id: execution_id

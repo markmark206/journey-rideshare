@@ -30,4 +30,12 @@ defmodule RsWeb.Live.Classes do
   def section_no_border() do
     "text-sm font-mono m-3 p-4 bg-base-100"
   end
+
+  def badge(active?) when active? == true do
+    " badge badge-info "
+  end
+
+  def badge(active?) when active? == false do
+    " badge badge-neutral "
+  end
 end

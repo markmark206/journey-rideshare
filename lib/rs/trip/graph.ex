@@ -32,23 +32,23 @@ defmodule RS.Trip.Graph do
 
         # Once the driver arrived at the pickup location, waiting for the passenger to board.
         compute(
-          :waiting_for_passenger_at_pickup,
+          :waiting_for_food_at_restaurant,
           unblocked_when({
             :and,
             [
               {:location_driver, &provided?/1},
               {:picked_up, fn x -> not provided?(x) end},
               {:driver_cancelled_time, fn x -> not provided?(x) end},
-              {:passenger_cancelled_time, fn x -> not provided?(x) end},
+              {:restaurant_cancelled_time, fn x -> not provided?(x) end},
               {:driver_reported_pickup_time, fn x -> not provided?(x) end}
             ]
           }),
-          &driver_at_pickup_location/1
+          &driver_at_restaurant/1
         ),
 
         # Once the driver arrived at the drop off location, waiting for the passenger to exit.
         compute(
-          :waiting_for_passenger_at_dropoff,
+          :waiting_for_customer_at_dropoff,
           unblocked_when({
             :and,
             [
@@ -62,26 +62,26 @@ defmodule RS.Trip.Graph do
 
         # Wait for the passenger for a few minutes, before giving up..
         schedule_once(
-          :done_waiting_for_passenger_at_pickup_schedule,
-          unblocked_when(:waiting_for_passenger_at_pickup, &true?/1),
+          :done_waiting_for_food_at_restaurant_schedule,
+          unblocked_when(:waiting_for_food_at_restaurant, &true?/1),
           &in_five_minutes/1
         ),
         mutate(
-          :done_waiting_for_passenger_at_pickup,
+          :done_waiting_for_food_at_restaurant,
           [
-            :done_waiting_for_passenger_at_pickup_schedule,
-            :waiting_for_passenger_at_pickup
+            :done_waiting_for_food_at_restaurant_schedule,
+            :waiting_for_food_at_restaurant
           ],
-          &record_driver_cancelled_time_after_waiting_for_passenger_at_pickup/1,
+          &record_driver_cancelled_time_after_waiting_for_food_at_restaurant/1,
           mutates: :driver_cancelled_time,
           update_revision_on_change: true
         ),
 
-        # If the driver or passenger cancel, record the time.
+        # If the driver or restaurant cancel, record the time.
         input(:driver_cancelled_time),
-        input(:passenger_cancelled_time),
+        input(:restaurant_cancelled_time),
 
-        # When the driver picks up or drops off the passenger, record the time.
+        # When the driver picks up or drops off the food, record the time.
         input(:picked_up),
         compute(:driver_reported_pickup_time, [:picked_up], &record_pickup_time/1),
         input(:dropped_off),
@@ -133,7 +133,7 @@ defmodule RS.Trip.Graph do
           fn _ -> {:ok, true} end
         ),
         compute(
-          :reached_pickup_location,
+          :reached_restaurant,
           unblocked_when({
             :and,
             [
@@ -169,7 +169,7 @@ defmodule RS.Trip.Graph do
             [
               {:location_driver, &provided?/1},
               {:driver_cancelled_time, fn x -> not provided?(x) end},
-              {:passenger_cancelled_time, fn x -> not provided?(x) end},
+              {:restaurant_cancelled_time, fn x -> not provided?(x) end},
               {:driver_reported_pickup_time, fn x -> not provided?(x) end}
             ]
           }),
@@ -184,7 +184,7 @@ defmodule RS.Trip.Graph do
             [
               {:location_driver, &provided?/1},
               {:driver_cancelled_time, fn x -> not provided?(x) end},
-              {:passenger_cancelled_time, fn x -> not provided?(x) end},
+              {:restaurant_cancelled_time, fn x -> not provided?(x) end},
               {:driver_reported_pickup_time, fn x -> provided?(x) end},
               {:driver_reported_dropoff_time, fn x -> not provided?(x) end}
             ]
@@ -200,7 +200,7 @@ defmodule RS.Trip.Graph do
             [
               {:trip_completed_at, fn x -> not provided?(x) end},
               {:driver_cancelled_time, fn x -> not provided?(x) end},
-              {:passenger_cancelled_time, fn x -> not provided?(x) end},
+              {:restaurant_cancelled_time, fn x -> not provided?(x) end},
               {:driver_reported_dropoff_time, fn x -> not provided?(x) end}
             ]
           }),
@@ -216,13 +216,13 @@ defmodule RS.Trip.Graph do
 
         # Wait for the passenger to exit the car for a few minutes, before asking them to leave.
         schedule_once(
-          :done_waiting_for_passenger_to_leave_schedule,
-          unblocked_when(:waiting_for_passenger_at_dropoff, &true?/1),
+          :done_waiting_for_customer_schedule,
+          unblocked_when(:waiting_for_customer_at_dropoff, &true?/1),
           &in_five_minutes/1
         ),
         mutate(
-          :done_waiting_for_passenger_to_leave,
-          [:done_waiting_for_passenger_to_leave_schedule, :waiting_for_passenger_at_dropoff],
+          :done_waiting_for_customer,
+          [:done_waiting_for_customer_schedule, :waiting_for_customer_at_dropoff],
           &record_driver_asked_for_customer_to_leave/1,
           mutates: :dropped_off,
           update_revision_on_change: true
@@ -236,7 +236,7 @@ defmodule RS.Trip.Graph do
             :or,
             [
               {:driver_cancelled_time, &provided?/1},
-              {:passenger_cancelled_time, &provided?/1},
+              {:restaurant_cancelled_time, &provided?/1},
               {:payment, &provided?/1}
             ]
           }),
@@ -254,16 +254,16 @@ defmodule RS.Trip.Graph do
           unblocked_when({
             :or,
             [
-              {:done_waiting_for_passenger_at_pickup, &provided?/1},
-              {:done_waiting_for_passenger_to_leave, &provided?/1},
+              {:done_waiting_for_food_at_restaurant, &provided?/1},
+              {:done_waiting_for_customer, &provided?/1},
               {:location_driver_initial, &provided?/1},
               {:driver_cancelled_time, &provided?/1},
-              {:passenger_cancelled_time, &provided?/1},
+              {:restaurant_cancelled_time, &provided?/1},
               {:picked_up, &provided?/1},
               {:dropped_off, &provided?/1},
               {:payment, &provided?/1},
               {:at_starting_point, &provided?/1},
-              {:reached_pickup_location, &provided?/1},
+              {:reached_restaurant, &provided?/1},
               {:reached_dropoff_location, &provided?/1},
               {:en_route, &provided?/1},
               {:trip_completed_at, &provided?/1}

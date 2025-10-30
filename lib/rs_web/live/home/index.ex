@@ -139,7 +139,12 @@ defmodule RsWeb.Live.Home.Index do
               class="btn btn-sm btn-primary p-4 m-3 w-full"
             >
               Start a New Trip
-              (<span class="font-mono badge badge-neutral">{drivers_available() - @trips_in_progress}</span> drivers available)
+              <span
+                :if={@trips_in_progress >= drivers_available()}
+                class=""
+              >
+                (no drivers available)
+              </span>
             </.button>
           </div>
 
