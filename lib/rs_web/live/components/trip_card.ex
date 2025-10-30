@@ -65,7 +65,7 @@ defmodule RsWeb.Live.Components.TripCard do
                 @trip_values.trip_completed_at != nil
             }
             id={"pickup-passenger1-#{@trip}"}
-            phx-click="pickup_customer"
+            phx-click="on_pickup_customer_button_click"
             phx-value-trip={@trip}
             class="btn btn-sm btn-primary my-2 py-2"
           >
@@ -74,7 +74,7 @@ defmodule RsWeb.Live.Components.TripCard do
           <.button
             disabled={@trip_values.waiting_for_passenger_at_dropoff != true or @trip_values.trip_completed_at != nil}
             id={"drop-off-passenger1-#{@trip}"}
-            phx-click="dropoff_customer"
+            phx-click="on_dropoff_customer_button_click"
             phx-value-trip={@trip}
             class="btn btn-sm btn-primary my-2 py-2"
           >

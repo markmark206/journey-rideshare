@@ -5,10 +5,18 @@ defmodule RsWeb.Live.Trip2.Index do
   require Logger
 
   def mount(params, session, socket) do
-    Logger.info("Mounting RSWeb.Live.Trip.Index LiveView #{inspect(params)}")
+    Logger.debug("Mounting RSWeb.Live.Trip.Index LiveView #{inspect(params)}")
 
     connected? = connected?(socket)
     embedded? = not is_map(params)
+
+    time_zone =
+      socket
+      |> get_connect_params()
+      |> case do
+        nil -> nil
+        params -> Map.get(params, "time_zone")
+      end
 
     show_details = is_map(params) and false != Map.get(params, "show_details", false)
 
@@ -16,13 +24,14 @@ defmodule RsWeb.Live.Trip2.Index do
       assign(socket, connected?: connected?)
       |> assign(show_details: show_details)
       |> assign(embedded?: embedded?)
+      |> assign(time_zone: time_zone)
       |> mount_with_connected(params, session, connected?)
 
     {:ok, socket}
   end
 
   def mount_with_connected(socket, params, session, connected?) when connected? == true do
-    Logger.info("Connected to LiveView")
+    Logger.debug("Connected to LiveView")
 
     trip =
       if session["trip"] != nil do
@@ -35,9 +44,6 @@ defmodule RsWeb.Live.Trip2.Index do
         end
       end
 
-    # params["trip"] |> IO.inspect(label: "trip")
-    # trip = nil
-
     if trip != nil do
       :ok = Phoenix.PubSub.subscribe(Rs.PubSub, "trip:#{trip}")
     end
@@ -46,18 +52,14 @@ defmodule RsWeb.Live.Trip2.Index do
   end
 
   def mount_with_connected(socket, _params, _session, connected?) when connected? == false do
-    Logger.info("Not connected to LiveView")
+    Logger.debug("Not connected to LiveView")
     socket
   end
 
-  # def handle_params(_params, _url, socket) do
-  #  {:noreply, socket}
-  # end
-
-  def handle_event("pickup_customer", _params, socket) do
-    Logger.info("Picking up customer")
-
+  def handle_event("on_pickup_customer_button_click", _params, socket) do
     trip = socket.assigns.trip
+
+    Logger.info("#{trip}: on_pickup_customer_button_click")
 
     Task.start(fn ->
       Journey.set(trip, :picked_up, true)
@@ -69,10 +71,9 @@ defmodule RsWeb.Live.Trip2.Index do
     {:noreply, socket}
   end
 
-  def handle_event("dropoff_customer", _params, socket) do
-    Logger.info("dropping off customer")
-
+  def handle_event("on_dropoff_customer_button_click", _params, socket) do
     trip = socket.assigns.trip
+    Logger.info("#{trip}: on_dropoff_customer_button_click")
 
     Task.start(fn ->
       Journey.set(trip, :dropped_off, true)
@@ -84,48 +85,8 @@ defmodule RsWeb.Live.Trip2.Index do
     {:noreply, socket}
   end
 
-  def handle_event("start_trip", _params, socket) do
-    Logger.info("Starting trip")
-
-    driver = RS.Driver.new("Mario")
-    passenger = RS.Passenger.new("Luigi")
-
-    socket =
-      socket
-      |> assign(:driver, driver)
-      |> assign(:passenger, passenger)
-
-    initial_driver_location = :rand.uniform(5) + 2
-    location_pickup = initial_driver_location + :rand.uniform(5) + 3
-    location_dropoff = location_pickup + :rand.uniform(20) + 5
-    price = (location_dropoff - location_pickup) * 3 + (location_pickup - initial_driver_location) * 2
-
-    trip =
-      RS.Trip.new(
-        driver,
-        passenger,
-        initial_driver_location,
-        location_pickup,
-        location_dropoff,
-        price
-      )
-
-    if socket.assigns.trip != nil do
-      :ok = Phoenix.PubSub.unsubscribe(Rs.PubSub, "trip:#{socket.assigns.trip}")
-    end
-
-    :ok = Phoenix.PubSub.subscribe(Rs.PubSub, "trip:#{trip}")
-
-    socket =
-      socket
-      |> load_trip_to_socket_assigns(trip)
-      |> push_patch(to: "/trip/#{trip}")
-
-    {:noreply, socket}
-  end
-
-  def handle_info({:trip_updated, trip}, socket) do
-    Logger.info("#{trip}: Handling trip update")
+  def handle_info({:trip_updated, trip, node_name}, socket) do
+    Logger.debug("#{trip}: Handling trip update #{node_name}")
     {:noreply, load_trip_to_socket_assigns(socket, trip)}
   end
 
@@ -137,30 +98,23 @@ defmodule RsWeb.Live.Trip2.Index do
     |> assign(:passenger, nil)
     |> assign(:trip, nil)
     |> assign(:trip_values, nil)
-    |> assign(:trip_summary, nil)
   end
 
   def load_trip_to_socket_assigns(socket, trip) when trip != nil do
-    Logger.info("#{trip}: Loading trip to socket assigns")
+    Logger.debug("#{trip}: Loading trip to socket assigns")
     trip_values = Journey.load(trip) |> Journey.values(include_unset_as_nil: true)
-    # Journey.Tools.summarize_as_text(trip)
-    trip_summary = nil
-
-    # history =
-    #  trip_values.trip_history |> Enum.map(fn %{"node" => node} -> "#{node}" end) |> Enum.join("\n")
-
-    # IO.inspect(history, label: "history")
 
     socket
     |> assign(:driver, trip_values.driver_id)
     |> assign(:passenger, trip_values.passenger_id)
     |> assign(:trip, trip)
     |> assign(:trip_values, trip_values)
-    |> assign(:trip_summary, trip_summary)
   end
 
-  # def render(assigns) do
-  #  ~H"""
-  #  """
-  # end
+  defp to_datetime_string(unix_timestamp, time_zone) do
+    unix_timestamp
+    |> DateTime.from_unix!()
+    |> DateTime.shift_zone!(time_zone)
+    |> Calendar.strftime("%Y%m%d %H:%M:%S")
+  end
 end

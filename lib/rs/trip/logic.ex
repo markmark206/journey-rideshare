@@ -76,7 +76,6 @@ defmodule RS.Trip.Logic do
       else
         read_gps_data(last_position)
       end
-      |> IO.inspect(label: "new_position")
 
     {:ok, new_position}
   end
@@ -186,8 +185,8 @@ defmodule RS.Trip.Logic do
   end
 
   def notify_pubsub_of_trip_update(trip, node_name, _values) do
-    Logger.info("#{trip}: Notifying pubsub of trip update #{node_name}")
-    Phoenix.PubSub.broadcast(Rs.PubSub, "trip:#{trip}", {:trip_updated, trip})
+    Logger.debug("#{trip}: Notifying pubsub of trip update #{node_name}")
+    Phoenix.PubSub.broadcast(Rs.PubSub, "trip:#{trip}", {:trip_updated, trip, node_name})
     {:ok, "trip updated"}
   end
 end

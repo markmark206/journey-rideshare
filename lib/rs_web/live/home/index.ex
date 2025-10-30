@@ -8,15 +8,25 @@ defmodule RsWeb.Live.Home.Index do
 
     connected? = connected?(socket)
 
+    time_zone =
+      socket
+      |> get_connect_params()
+      |> case do
+        nil -> nil
+        params -> Map.get(params, "time_zone")
+      end
+      |> IO.inspect(label: "time_zone")
+
     socket =
       assign(socket, connected?: connected?)
+      |> assign(time_zone: time_zone)
       |> mount_with_connected(params, session, connected?)
 
     {:ok, socket}
   end
 
   def mount_with_connected(socket, _params, _session, connected?) when connected? == true do
-    Logger.info("Connected to LiveView")
+    Logger.debug("Connected to LiveView")
 
     trips_in_progress =
       Journey.list_executions(
@@ -25,7 +35,6 @@ defmodule RsWeb.Live.Home.Index do
         limit: 100
       )
       |> Enum.count()
-      |> IO.inspect(label: "active_trips")
 
     trips =
       Journey.list_executions(graph_name: "trip", sort_by: [created_at: :desc], limit: 100)
@@ -42,7 +51,7 @@ defmodule RsWeb.Live.Home.Index do
     socket |> assign(trips: [])
   end
 
-  def handle_event("start_trip", _params, socket) do
+  def handle_event("on_start_trip_button_click", _params, socket) do
     Logger.info("Starting trip")
 
     driver = RS.Driver.new("Mario")
@@ -86,7 +95,7 @@ defmodule RsWeb.Live.Home.Index do
             <.button
               id="start-a-new-trip-button-id"
               disabled={@trips_in_progress >= 20}
-              phx-click="start_trip"
+              phx-click="on_start_trip_button_click"
               class="btn btn-sm btn-primary p-4 m-3 w-full"
             >
               Start a New Trip
