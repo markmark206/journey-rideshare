@@ -240,7 +240,12 @@ defmodule RS.Trip.Graph do
               {:payment, &provided?/1}
             ]
           }),
-          &now/1
+          &now/1,
+          f_on_save: fn trip, _params ->
+            Logger.info("#{trip}: Notifying pubsub of trip completion")
+            Phoenix.PubSub.broadcast(Rs.PubSub, "trip_completed", {:trip_completed, trip})
+            {:ok, "trip completed"}
+          end
         ),
 
         # Record the history of the trip.
