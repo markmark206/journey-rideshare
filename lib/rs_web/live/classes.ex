@@ -16,7 +16,7 @@ defmodule RsWeb.Live.Classes do
   end
 
   def section() do
-    "mx-auto border-1 text-xs rounded-md p-4 bg-base-100"
+    "mx-auto text-xs bg-base-100"
   end
 
   def section2() do

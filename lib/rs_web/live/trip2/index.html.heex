@@ -8,7 +8,7 @@
     />
     <div
       :if={@trip_values != nil and not @embedded?}
-      id={"trip-status-#{@trip}-id"}
+      id={"trip-detailed-status-#{@trip}-id"}
       class={section()}
     >
       <RsWeb.Live.Components.TripCard.render trip_values={@trip_values} trip={@trip} embedded={false} />

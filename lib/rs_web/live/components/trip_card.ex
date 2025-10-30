@@ -19,7 +19,7 @@ defmodule RsWeb.Live.Components.TripCard do
           <span><span class={data_point()}>{@trip}</span></span>
           <span :if={@trip_values.trip_completed_at == nil} class="ml-auto flex items-center gap-2">
             <span>in progress</span>
-            <span class="font-mono status status-success status-md animate-ping"></span>
+            <span class="font-mono status status-success status-md animate-pulse"></span>
           </span>
           <span
             :if={@trip_values.trip_completed_at != nil and @trip_values.payment != nil}
@@ -33,7 +33,6 @@ defmodule RsWeb.Live.Components.TripCard do
             class="ml-auto flex items-center gap-2"
           >
             <span>completed</span>
-            <span class="font-mono text-secondary-content">◯</span>
           </span>
         </h1>
         <div class="text-xs font-mono">
@@ -68,7 +67,7 @@ defmodule RsWeb.Live.Components.TripCard do
             id={"pickup-passenger1-#{@trip}"}
             phx-click="pickup_customer"
             phx-value-trip={@trip}
-            class="btn btn-sm btn-success my-2 py-2"
+            class="btn btn-sm btn-primary my-2 py-2"
           >
             Pick Up
           </.button>
@@ -77,7 +76,7 @@ defmodule RsWeb.Live.Components.TripCard do
             id={"drop-off-passenger1-#{@trip}"}
             phx-click="dropoff_customer"
             phx-value-trip={@trip}
-            class="btn btn-sm btn-success my-2 py-2"
+            class="btn btn-sm btn-primary my-2 py-2"
           >
             Drop Off
           </.button>
@@ -113,7 +112,7 @@ defmodule RsWeb.Live.Components.TripCard do
             :if={@trip_values.waiting_for_passenger_at_pickup == true and @trip_values.trip_completed_at == nil}
             class="font-mono badge badge-info"
           >
-            Waiting for Passenger at pickup location.
+            <span class="animate-pulse">⌛️</span> Waiting for Passenger
           </div>
           <div :if={@trip_values.picked_up == true} class="dropdown dropdown-top inline-block">
             <label tabindex="0">
@@ -125,23 +124,14 @@ defmodule RsWeb.Live.Components.TripCard do
               <p class="text-sm">The passenger was picked up</p>
             </div>
           </div>
-          <div :if={@trip_values.dropped_off == true} class="dropdown dropdown-top inline-block">
-            <label tabindex="0">
-              <div class="font-mono badge badge-neutral">
-                Dropped Off
-              </div>
-            </label>
-            <div tabindex="0" class="dropdown-content z-[1] p-3 shadow bg-base-200 rounded-box mb-1 min-w-[200px]">
-              <p class="text-sm">The passenger was dropped off</p>
-            </div>
-          </div>
+
           <div
             :if={@trip_values.done_waiting_for_passenger_at_pickup != nil and @trip_values.trip_completed_at != nil}
             class="dropdown dropdown-top inline-block"
           >
             <label tabindex="0">
               <span class="font-mono badge badge-warning">
-                Passenger no show
+                No show
               </span>
             </label>
             <div tabindex="0" class="dropdown-content z-[1] p-3 shadow bg-base-200 rounded-box mb-1 min-w-[200px]">
@@ -150,7 +140,7 @@ defmodule RsWeb.Live.Components.TripCard do
           </div>
 
           <span :if={@trip_values.waiting_for_passenger_at_dropoff == true} class="font-mono badge badge-info">
-            ⌛️ Waiting for Passenger to exit.
+            <span class="animate-pulse">⌛️</span> Waiting for Passenger to exit
           </span>
           <div :if={@trip_values.done_waiting_for_passenger_to_leave != nil} class="dropdown dropdown-top inline-block">
             <label tabindex="0">
@@ -160,6 +150,16 @@ defmodule RsWeb.Live.Components.TripCard do
             </label>
             <div tabindex="0" class="dropdown-content z-[1] p-3 shadow bg-base-200 rounded-box mb-1 min-w-[200px]">
               <p class="text-sm">The passenger was asked to leave the car</p>
+            </div>
+          </div>
+          <div :if={@trip_values.dropped_off == true} class="dropdown dropdown-top inline-block">
+            <label tabindex="0">
+              <div class="font-mono badge badge-neutral">
+                Dropped Off
+              </div>
+            </label>
+            <div tabindex="0" class="dropdown-content z-[1] p-3 shadow bg-base-200 rounded-box mb-1 min-w-[200px]">
+              <p class="text-sm">The passenger was dropped off</p>
             </div>
           </div>
           <div :if={@trip_values.payment != nil} class="dropdown dropdown-top inline-block">
@@ -178,6 +178,13 @@ defmodule RsWeb.Live.Components.TripCard do
             class="absolute bottom-2 right-2 hover:opacity-70 transition-opacity p-2"
           >
             <.icon name="hero-arrows-pointing-out" class="w-6 h-6" />
+          </.link>
+          <.link
+            :if={!@embedded}
+            navigate="/"
+            class="absolute bottom-2 right-2 hover:opacity-70 transition-opacity p-2"
+          >
+            <.icon name="hero-arrows-pointing-in" class="w-6 h-6" />
           </.link>
         </div>
       </div>

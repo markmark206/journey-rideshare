@@ -88,7 +88,7 @@ defmodule RsWeb.Live.Home.Index do
               id="start-a-new-trip-button-id"
               disabled={@trips_in_progress >= 20}
               phx-click="start_trip"
-              class="btn btn-sm btn-success p-4 m-3 w-full"
+              class="btn btn-sm btn-primary p-4 m-3 w-full"
             >
               Start a New Trip
             </.button>
