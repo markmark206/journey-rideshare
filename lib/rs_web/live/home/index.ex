@@ -1,7 +1,6 @@
 defmodule RsWeb.Live.Home.Index do
   use RsWeb, :live_view
 
-  import RsWeb.Live.Classes
   require Logger
 
   def mount(params, session, socket) do

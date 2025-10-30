@@ -1,6 +1,11 @@
 defmodule RS.Trip.Logic do
   require Logger
 
+  def starting_point_label(), do: "starting point"
+  def pickup_point_label(), do: "pickup point"
+  def dropoff_point_label(), do: "drop off point"
+  def en_route_label(), do: "en route"
+
   def in_five_seconds(_) do
     {:ok, System.system_time(:second) + 5}
   end
@@ -89,6 +94,25 @@ defmodule RS.Trip.Logic do
       end
 
     {:ok, new_position}
+  end
+
+  def compute_label(x) do
+    location_label =
+      cond do
+        Map.get(x, :location_driver_initial) == x.location_driver ->
+          starting_point_label()
+
+        Map.get(x, :location_pickup) == x.location_driver ->
+          pickup_point_label()
+
+        Map.get(x, :location_dropoff) == x.location_driver ->
+          dropoff_point_label()
+
+        true ->
+          en_route_label()
+      end
+
+    {:ok, location_label}
   end
 
   def process_payment(%{passenger_id: passenger_id, driver_id: driver_id, price: price, execution_id: execution_id}) do

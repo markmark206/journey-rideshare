@@ -29,36 +29,6 @@ defmodule RS.Trip.Graph do
 
         # The pre-agreed price of the trip.
         input(:price),
-        compute(
-          :current_status,
-          unblocked_when({
-            :or,
-            [
-              {:trip_completed_at, &provided?/1},
-              {:waiting_for_passenger_at_pickup, &provided?/1},
-              {:waiting_for_passenger_at_dropoff, &provided?/1},
-              {:current_location_label, &provided?/1}
-            ]
-          }),
-          fn x ->
-            label =
-              cond do
-                Map.get(x, :waiting_for_passenger_at_pickup) ->
-                  "waiting for passenger at pickup"
-
-                Map.get(x, :waiting_for_passenger_at_dropoff) ->
-                  "waiting for passenger to exit the car dropoff"
-
-                Map.get(x, :trip_completed_at) ->
-                  "trip complete"
-
-                true ->
-                  "unknown"
-              end
-
-            {:ok, label}
-          end
-        ),
 
         # Once the driver arrived at the pickup location, waiting for the passenger to board.
         compute(
@@ -125,16 +95,16 @@ defmodule RS.Trip.Graph do
             location_label =
               cond do
                 Map.get(x, :location_driver_initial) == x.location_driver ->
-                  "starting point"
+                  starting_point_label()
 
                 Map.get(x, :location_pickup) == x.location_driver ->
-                  "pickup point"
+                  pickup_point_label()
 
                 Map.get(x, :location_dropoff) == x.location_driver ->
-                  "drop off point"
+                  dropoff_point_label()
 
                 true ->
-                  "en route"
+                  en_route_label()
               end
 
             {:ok, location_label}
@@ -146,7 +116,7 @@ defmodule RS.Trip.Graph do
             :and,
             [
               {:location_driver, &provided?/1},
-              {:current_location_label, fn x -> x.node_value == "en route" end}
+              {:current_location_label, fn x -> x.node_value == en_route_label() end}
             ]
           }),
           fn _ -> {:ok, true} end
@@ -157,7 +127,7 @@ defmodule RS.Trip.Graph do
             :and,
             [
               {:location_driver, &provided?/1},
-              {:current_location_label, fn x -> x.node_value == "starting point" end}
+              {:current_location_label, fn x -> x.node_value == starting_point_label() end}
             ]
           }),
           fn _ -> {:ok, true} end
@@ -170,7 +140,7 @@ defmodule RS.Trip.Graph do
               {:location_driver, &provided?/1},
               {:current_location_label,
                fn x ->
-                 x.node_value == "pickup point"
+                 x.node_value == pickup_point_label()
                end}
             ]
           }),
@@ -184,7 +154,7 @@ defmodule RS.Trip.Graph do
               {:location_driver, &provided?/1},
               {:current_location_label,
                fn x ->
-                 x.node_value == "drop off point"
+                 x.node_value == dropoff_point_label()
                end}
             ]
           }),
@@ -270,7 +240,7 @@ defmodule RS.Trip.Graph do
               {:payment, &provided?/1}
             ]
           }),
-          fn _ -> {:ok, System.system_time(:second)} end
+          &now/1
         ),
 
         # Record the history of the trip.
@@ -295,8 +265,6 @@ defmodule RS.Trip.Graph do
             ]
           })
         )
-
-        # compute(:current_status, [:location_driver_initial, :location_driver, :location_pickup, :location_dropoff], &calculate_current_status/1)
       ],
       f_on_save: &notify_pubsub_of_trip_update/3,
       execution_id_prefix: @graph_name
