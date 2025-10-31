@@ -152,7 +152,7 @@ defmodule RsWeb.Live.Home.Index do
           </div>
 
           <%= for trip <- @trips do %>
-            {live_render(@socket, RsWeb.Live.Trip2.Index,
+            {live_render(@socket, RsWeb.Live.Trip.Index,
               id: "trip-lv-#{trip}",
               session: %{"trip" => trip}
             )}

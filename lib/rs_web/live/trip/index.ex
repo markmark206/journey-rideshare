@@ -1,4 +1,4 @@
-defmodule RsWeb.Live.Trip2.Index do
+defmodule RsWeb.Live.Trip.Index do
   use RsWeb, :live_view
 
   import RsWeb.Live.Classes

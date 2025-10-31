@@ -19,7 +19,7 @@ defmodule RsWeb.Router do
 
     live "/", Live.Home.Index
     # live "/", Live.Trip.Index
-    live "/trip/:trip", Live.Trip2.Index
+    live "/trip/:trip", Live.Trip.Index
     # get "/", PageController, :home
   end
 
