@@ -18,7 +18,7 @@ defmodule RS.Trip.Graph do
 
         # Initial parameters of the trip.
         input(:driver_id),
-        input(:passenger_id),
+        input(:order_id),
 
         # For the purpose of this simulation, assume a 1-dimensional space, where location is a number.
         # Once the trip starts, location_driver is continuously updated by the "car's GPS."
@@ -28,9 +28,9 @@ defmodule RS.Trip.Graph do
         input(:location_dropoff),
 
         # The pre-agreed price of the trip.
-        input(:price),
+        input(:price_cents),
 
-        # Once the driver arrived at the pickup location, waiting for the passenger to board.
+        # Once the driver arrived at the pickup location, waiting for the food to be ready.
         compute(
           :waiting_for_food_at_restaurant,
           unblocked_when({
@@ -46,21 +46,21 @@ defmodule RS.Trip.Graph do
           &driver_at_restaurant/1
         ),
 
-        # Once the driver arrived at the drop off location, waiting for the passenger to exit.
+        # Once the driver arrived at the drop off location, waiting for the customer to come out and get the food.
         compute(
           :waiting_for_customer_at_dropoff,
           unblocked_when({
             :and,
             [
               {:location_driver, &provided?/1},
-              {:picked_up, &provided?/1},
-              {:dropped_off, fn x -> not provided?(x) end}
+              {:picked_up, &true?/1},
+              {:dropped_off, fn x -> not provided?(x) or !true?(x) end}
             ]
           }),
           &driver_at_dropoff_location/1
         ),
 
-        # Wait for the passenger for a few minutes, before giving up..
+        # Wait for the food at the restaurant.
         schedule_once(
           :done_waiting_for_food_at_restaurant_schedule,
           unblocked_when(:waiting_for_food_at_restaurant, &true?/1),
@@ -91,24 +91,7 @@ defmodule RS.Trip.Graph do
         compute(
           :current_location_label,
           [:location_driver],
-          fn x ->
-            location_label =
-              cond do
-                Map.get(x, :location_driver_initial) == x.location_driver ->
-                  starting_point_label()
-
-                Map.get(x, :location_pickup) == x.location_driver ->
-                  pickup_point_label()
-
-                Map.get(x, :location_dropoff) == x.location_driver ->
-                  dropoff_point_label()
-
-                true ->
-                  en_route_label()
-              end
-
-            {:ok, location_label}
-          end
+          &compute_location_label/1
         ),
         compute(
           :en_route,
@@ -214,7 +197,7 @@ defmodule RS.Trip.Graph do
           update_revision_on_change: true
         ),
 
-        # Wait for the passenger to exit the car for a few minutes, before asking them to leave.
+        # Wait for the customer to come out and pickup the item for a few minutes.
         schedule_once(
           :done_waiting_for_customer_schedule,
           unblocked_when(:waiting_for_customer_at_dropoff, &true?/1),
@@ -229,7 +212,7 @@ defmodule RS.Trip.Graph do
         ),
 
         # Once the drop off occurred, the payment is processed.
-        compute(:payment, [:driver_reported_dropoff_time, :price], &process_payment/1),
+        compute(:payment, [:driver_reported_dropoff_time, :price_cents], &process_payment/1),
         compute(
           :trip_completed_at,
           unblocked_when({

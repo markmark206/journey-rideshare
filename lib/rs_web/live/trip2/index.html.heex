@@ -16,7 +16,7 @@
       <div :if={@show_details} class={section2()}>
         <div class={list_element()}>Driver: <span class={data_point_no_border()}>{@trip_values.driver_id}</span></div>
         <div class={list_element()}>
-          Passenger: <span class={data_point_no_border()}>{@trip_values.passenger_id}</span>
+          Order: <span class={data_point_no_border()}>{@trip_values.order_id}</span>
         </div>
         <div class={list_element()}>
           Starting point: <span class={data_point_no_border()}>{@trip_values.location_driver_initial}</span>
@@ -28,7 +28,7 @@
           Dropoff point: <span class={data_point_no_border()}>{@trip_values.location_dropoff}</span>
         </div>
         <div class={list_element()}>
-          Price: <span class={data_point_no_border()}>${@trip_values.price}</span>
+          Price: <span class={data_point_no_border()}>${@trip_values.price_cents/100}</span>
         </div>
       </div>
 

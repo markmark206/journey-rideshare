@@ -95,7 +95,7 @@ defmodule RS.Trip.Logic do
     {:ok, new_position}
   end
 
-  def compute_label(x) do
+  def compute_location_label(x) do
     location_label =
       cond do
         Map.get(x, :location_driver_initial) == x.location_driver ->
@@ -114,15 +114,15 @@ defmodule RS.Trip.Logic do
     {:ok, location_label}
   end
 
-  def process_payment(%{passenger_id: passenger_id, driver_id: driver_id, price: price, execution_id: execution_id}) do
+  def process_payment(%{order_id: order_id, driver_id: driver_id, price_cents: price_cents, execution_id: execution_id}) do
     Logger.info("""
     #{execution_id}:
     Item dropped off.
-    Charging `#{passenger_id}` $#{price}, to driver `#{driver_id}`.
+    Charging `#{order_id}` $#{price_cents / 100}, to driver `#{driver_id}`.
     The trip is now complete.
     """)
 
-    {:ok, "charged $#{price}. pickup `#{passenger_id}`, driver `#{driver_id}`"}
+    {:ok, "charged $#{price_cents / 100}. pickup `#{order_id}`, driver `#{driver_id}`"}
   end
 
   def now(_) do

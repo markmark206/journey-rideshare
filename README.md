@@ -87,7 +87,7 @@ iex(6)> trip |> Journey.load() |> Journey.values()
   last_updated_at: 1761507199,
   driver_location_current: 25,
   dropoff_location: 25,
-  passenger_id: "PASSENGER3TMJ027H0795M8YAE3AA",
+  order_id: "PASSENGER3TMJ027H0795M8YAE3AA",
   pickup_location: 19,
   price: 98,
   picked_up: true,

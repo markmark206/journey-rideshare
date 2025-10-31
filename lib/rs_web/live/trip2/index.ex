@@ -95,7 +95,7 @@ defmodule RsWeb.Live.Trip2.Index do
 
     socket
     |> assign(:driver, nil)
-    |> assign(:passenger, nil)
+    |> assign(:order_id, nil)
     |> assign(:trip, nil)
     |> assign(:trip_values, nil)
   end
@@ -106,7 +106,7 @@ defmodule RsWeb.Live.Trip2.Index do
 
     socket
     |> assign(:driver, trip_values.driver_id)
-    |> assign(:passenger, trip_values.passenger_id)
+    |> assign(:order_id, trip_values.order_id)
     |> assign(:trip, trip)
     |> assign(:trip_values, trip_values)
   end

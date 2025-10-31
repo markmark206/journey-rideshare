@@ -178,7 +178,7 @@ defmodule RsWeb.Live.Components.TripCard do
           <div :if={@trip_values.payment != nil} class="dropdown dropdown-top inline-block">
             <label tabindex="0">
               <div class="font-mono badge badge-success">
-                ${@trip_values.price}
+                ${@trip_values.price_cents / 100}
               </div>
             </label>
             <div tabindex="0" class="dropdown-content z-[1] p-3 shadow bg-base-200 rounded-box mb-1 min-w-[200px]">

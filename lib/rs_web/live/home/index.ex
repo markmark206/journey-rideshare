@@ -65,22 +65,25 @@ defmodule RsWeb.Live.Home.Index do
   def handle_event("on_start_trip_button_click", _params, socket) do
     Logger.info("Starting trip")
 
-    driver = RS.Driver.new("Mario")
-    passenger = RS.Passenger.new("Luigi")
+    driver_id = RS.Helpers.random_string("DRIVER", 15)
+    order_id = RS.Helpers.random_string("ORDER", 15)
 
     initial_driver_location = :rand.uniform(3) + 2
     location_pickup = initial_driver_location + :rand.uniform(5) + 3
     location_dropoff = location_pickup + :rand.uniform(14) + 5
-    price = (location_dropoff - location_pickup) * 3 + (location_pickup - initial_driver_location) * 2
+
+    price_cents =
+      (300 + (location_dropoff - location_pickup) * 100 / 3 + (location_pickup - initial_driver_location) * 100 / 2)
+      |> Float.round()
 
     trip =
       RS.Trip.new(
-        driver,
-        passenger,
+        driver_id,
+        order_id,
         initial_driver_location,
         location_pickup,
         location_dropoff,
-        price
+        price_cents
       )
 
     :ok = Phoenix.PubSub.broadcast(Rs.PubSub, "new_trips", {:trip_created, trip})

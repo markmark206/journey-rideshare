@@ -64,9 +64,7 @@ config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 config :tzdata, :autoupdate, :disabled
 
 config :journey, :graphs, [
-  &RS.Trip.Graph.graph/0,
-  &RS.Driver.graph/0,
-  &RS.Passenger.graph/0
+  &RS.Trip.Graph.graph/0
 ]
 
 # Import environment specific config. This must remain at the bottom
