@@ -1,8 +1,9 @@
 defmodule RsWeb.PageControllerTest do
   use RsWeb.ConnCase
+  import Phoenix.LiveViewTest
 
-  test "GET /", %{conn: conn} do
-    conn = get(conn, ~p"/")
-    assert html_response(conn, 200) =~ "Peace of mind from prototype to production"
+  test "LIVE GET /", %{conn: conn} do
+    {:ok, _view, html} = live(conn, ~p"/")
+    assert html =~ "Trips in progress"
   end
 end
