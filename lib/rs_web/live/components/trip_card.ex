@@ -9,9 +9,9 @@ defmodule RsWeb.Live.Components.TripCard do
     cond do
       seconds < 60 -> "#{seconds}s"
       seconds < 3600 -> "#{div(seconds, 60)}m"
-      seconds < 86400 -> "#{div(seconds, 3600)}h"
-      seconds < 604800 -> "#{div(seconds, 86400)}d"
-      true -> "#{div(seconds, 604800)}w"
+      seconds < 86_400 -> "#{div(seconds, 3600)}h"
+      seconds < 604_800 -> "#{div(seconds, 86_400)}d"
+      true -> "#{div(seconds, 604_800)}w"
     end
   end
 

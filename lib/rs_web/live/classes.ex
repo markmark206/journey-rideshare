@@ -1,4 +1,6 @@
 defmodule RsWeb.Live.Classes do
+  @moduledoc false
+
   def section_title() do
     "text-lg font-bold pl-3"
   end
