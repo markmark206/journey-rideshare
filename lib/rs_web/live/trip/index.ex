@@ -57,10 +57,10 @@ defmodule RsWeb.Live.Trip.Index do
     socket
   end
 
-  def handle_event("on_pickup_customer_button_click", _params, socket) do
+  def handle_event("on_pickup_item_button_click", _params, socket) do
     trip = socket.assigns.trip
 
-    Logger.info("#{trip}: on_pickup_customer_button_click")
+    Logger.info("#{trip}: on_pickup_item_button_click")
 
     Task.start(fn ->
       Journey.set(trip, :picked_up, true)
@@ -72,9 +72,9 @@ defmodule RsWeb.Live.Trip.Index do
     {:noreply, socket}
   end
 
-  def handle_event("on_dropoff_customer_button_click", _params, socket) do
+  def handle_event("on_handoff_item_button_click", _params, socket) do
     trip = socket.assigns.trip
-    Logger.info("#{trip}: on_dropoff_customer_button_click")
+    Logger.info("#{trip}: on_handoff_item_button_click")
 
     Task.start(fn ->
       Journey.set(trip, :dropped_off, true)
