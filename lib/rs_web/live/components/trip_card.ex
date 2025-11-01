@@ -50,8 +50,8 @@ defmodule RsWeb.Live.Components.TripCard do
               cond do
                 i == @trip_values.location_pickup and @trip_values.done_waiting_for_food_at_restaurant != nil -> "?"
                 i == @trip_values.location_pickup and @trip_values.picked_up == true -> "o"
-                i == @trip_values.location_pickup and @trip_values.picked_up != true -> "🍔"
-                i == @trip_values.location_dropoff and @trip_values.dropped_off == true -> "🍔"
+                i == @trip_values.location_pickup and @trip_values.picked_up != true -> @trip_values.pickup_item
+                i == @trip_values.location_dropoff and @trip_values.dropped_off == true -> @trip_values.pickup_item
                 i == @trip_values.location_dropoff and @trip_values.dropped_off != true -> "🏡"
                 true -> "."
               end %>
@@ -62,7 +62,7 @@ defmodule RsWeb.Live.Components.TripCard do
           <%= for i <- @trip_values.location_driver_initial..@trip_values.location_dropoff do %>
             <%= cond do %>
               <% i == @trip_values.location_driver and @trip_values.trip_completed_at == nil and i >= @trip_values.location_pickup and @trip_values.picked_up -> %>
-                <span class="font-mono animate-pulse">🍔</span>
+                <span class="font-mono animate-pulse">{@trip_values.pickup_item}</span>
               <% i == @trip_values.location_driver and @trip_values.trip_completed_at == nil -> %>
                 <span class="font-mono animate-pulse">🚗</span>
               <% i <= @trip_values.location_driver -> %>
@@ -83,7 +83,7 @@ defmodule RsWeb.Live.Components.TripCard do
             phx-value-trip={@trip}
             class="btn btn-sm btn-primary my-2 py-2"
           >
-            🍔 Picked Up
+            {@trip_values.pickup_item} Picked Up
           </.button>
           <.button
             disabled={@trip_values.waiting_for_customer_at_dropoff != true or @trip_values.trip_completed_at != nil}
@@ -92,7 +92,7 @@ defmodule RsWeb.Live.Components.TripCard do
             phx-value-trip={@trip}
             class="btn btn-sm btn-primary my-2 py-2"
           >
-            🍔 Handed Off
+            {@trip_values.pickup_item} Handed Off
           </.button>
         </div>
 
@@ -134,7 +134,7 @@ defmodule RsWeb.Live.Components.TripCard do
           <div :if={@trip_values.picked_up == true} class="dropdown dropdown-top inline-block">
             <label tabindex="0">
               <div class="font-mono badge badge-neutral">
-                🍔 🚗
+                {@trip_values.pickup_item} 🚗
               </div>
             </label>
             <div tabindex="0" class="dropdown-content z-[1] p-3 shadow bg-base-200 rounded-box mb-1 min-w-[200px]">
@@ -165,7 +165,7 @@ defmodule RsWeb.Live.Components.TripCard do
           >
             <label tabindex="0">
               <span class="font-mono badge badge-neutral">
-                🍔 🏠
+                {@trip_values.pickup_item} 🏠
               </span>
             </label>
             <div tabindex="0" class="dropdown-content z-[1] p-3 shadow bg-base-200 rounded-box mb-1 min-w-[200px]">
@@ -178,7 +178,7 @@ defmodule RsWeb.Live.Components.TripCard do
           >
             <label tabindex="0">
               <div class="font-mono badge badge-neutral">
-                🍔 🧑‍🦱
+                {@trip_values.pickup_item} 🧑‍🦱
               </div>
             </label>
             <div tabindex="0" class="dropdown-content z-[1] p-3 shadow bg-base-200 rounded-box mb-1 min-w-[200px]">

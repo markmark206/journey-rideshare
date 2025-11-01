@@ -7,7 +7,8 @@ defmodule RS.Trip do
         driver_location,
         location_pickup,
         location_dropoff,
-        price_cents \\ nil
+        price_cents,
+        pickup_item
       ) do
     Logger.info("""
     Starting a new trip.
@@ -20,6 +21,7 @@ defmodule RS.Trip do
     Dropoff Location: #{location_dropoff}
 
     Price: $#{price_cents / 100}
+    Item: #{pickup_item}
     """)
 
     trip =
@@ -32,7 +34,8 @@ defmodule RS.Trip do
         location_driver: driver_location,
         location_pickup: location_pickup,
         location_dropoff: location_dropoff,
-        price_cents: price_cents
+        price_cents: price_cents,
+        pickup_item: pickup_item
       })
 
     trip.id
