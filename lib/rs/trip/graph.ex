@@ -30,6 +30,9 @@ defmodule RS.Trip.Graph do
         # The pre-agreed price of the trip.
         input(:price_cents),
 
+        # The emoji representing the food item being delivered.
+        input(:pickup_item),
+
         # Once the driver arrived at the pickup location, waiting for the food to be ready.
         compute(
           :waiting_for_food_at_restaurant,

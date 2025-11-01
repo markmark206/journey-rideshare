@@ -68,6 +68,32 @@ defmodule RsWeb.Live.Home.Index do
     driver_id = RS.Helpers.random_string("DRIVER", 15)
     order_id = RS.Helpers.random_string("ORDER", 15)
 
+    pickup_item =
+      Enum.random([
+        "🍔",
+        "🍕",
+        "🍟",
+        "🍱",
+        "🍣",
+        "🍜",
+        "🍲",
+        "🌮",
+        "🍕",
+        "🌭",
+        "🥗",
+        "🍝",
+        "🥞",
+        "🥙",
+        "🌯",
+        "🧇",
+        "🥪",
+        "🍛",
+        "🫔",
+        "🧆",
+        "🍽️",
+        "🍲"
+      ])
+
     initial_driver_location = :rand.uniform(3) + 2
     location_pickup = initial_driver_location + :rand.uniform(5) + 3
     location_dropoff = location_pickup + :rand.uniform(14) + 5
@@ -83,7 +109,8 @@ defmodule RsWeb.Live.Home.Index do
         initial_driver_location,
         location_pickup,
         location_dropoff,
-        price_cents
+        price_cents,
+        pickup_item
       )
 
     :ok = Phoenix.PubSub.broadcast(Rs.PubSub, "new_trips", {:trip_created, trip})
