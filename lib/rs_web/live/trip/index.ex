@@ -98,6 +98,7 @@ defmodule RsWeb.Live.Trip.Index do
     |> assign(:order_id, nil)
     |> assign(:trip, nil)
     |> assign(:trip_values, nil)
+    |> assign(:last_updated_seconds_ago, 0)
   end
 
   def load_trip_to_socket_assigns(socket, trip) when trip != nil do
@@ -109,6 +110,7 @@ defmodule RsWeb.Live.Trip.Index do
     |> assign(:order_id, trip_values.order_id)
     |> assign(:trip, trip)
     |> assign(:trip_values, trip_values)
+    |> assign(:last_updated_seconds_ago, System.system_time(:second) - trip_values.last_updated_at)
   end
 
   defp to_datetime_string(unix_timestamp, time_zone) do

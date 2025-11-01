@@ -5,6 +5,16 @@ defmodule RsWeb.Live.Components.TripCard do
 
   @moduledoc false
 
+  defp format_time_ago(seconds) do
+    cond do
+      seconds < 60 -> "#{seconds}s"
+      seconds < 3600 -> "#{div(seconds, 60)}m"
+      seconds < 86400 -> "#{div(seconds, 3600)}h"
+      seconds < 604800 -> "#{div(seconds, 86400)}d"
+      true -> "#{div(seconds, 604800)}w"
+    end
+  end
+
   def render(assigns) do
     ~H"""
     <div class="m-3">
@@ -25,13 +35,13 @@ defmodule RsWeb.Live.Components.TripCard do
             :if={@trip_values.trip_completed_at != nil and @trip_values.payment != nil}
             class="ml-auto flex items-center gap-2"
           >
-            <span>completed</span>
+            <span>completed</span><span class="font-mono badge badge-neutral">{format_time_ago(@last_updated_seconds_ago)}</span>
           </span>
           <span
             :if={@trip_values.trip_completed_at != nil and @trip_values.payment == nil}
             class="ml-auto flex items-center gap-2"
           >
-            <span>completed</span>
+            <span>completed</span><span class="font-mono badge badge-neutral">{format_time_ago(@last_updated_seconds_ago)}</span>
           </span>
         </h1>
         <div id="locations-destinations-id" class="text-xs font-mono">
