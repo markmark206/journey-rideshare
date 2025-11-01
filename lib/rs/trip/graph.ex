@@ -54,7 +54,7 @@ defmodule RS.Trip.Graph do
             [
               {:location_driver, &provided?/1},
               {:picked_up, &true?/1},
-              {:dropped_off, fn x -> not provided?(x) or !true?(x) end}
+              {:dropped_off, fn x -> !true?(x) end}
             ]
           }),
           &driver_at_dropoff_location/1
@@ -62,14 +62,14 @@ defmodule RS.Trip.Graph do
 
         # Wait for the food at the restaurant.
         schedule_once(
-          :done_waiting_for_food_at_restaurant_schedule,
+          :done_waiting_for_food_at_restaurant_timer,
           unblocked_when(:waiting_for_food_at_restaurant, &true?/1),
           &in_five_minutes/1
         ),
         mutate(
           :done_waiting_for_food_at_restaurant,
           [
-            :done_waiting_for_food_at_restaurant_schedule,
+            :done_waiting_for_food_at_restaurant_timer,
             :waiting_for_food_at_restaurant
           ],
           &record_driver_cancelled_time_after_waiting_for_food_at_restaurant/1,
@@ -99,7 +99,7 @@ defmodule RS.Trip.Graph do
             :and,
             [
               {:location_driver, &provided?/1},
-              {:current_location_label, fn x -> x.node_value == en_route_label() end}
+              {:current_location_label, &en_route?/1}
             ]
           }),
           fn _ -> {:ok, true} end
@@ -110,7 +110,7 @@ defmodule RS.Trip.Graph do
             :and,
             [
               {:location_driver, &provided?/1},
-              {:current_location_label, fn x -> x.node_value == starting_point_label() end}
+              {:current_location_label, &at_starting_point?/1}
             ]
           }),
           fn _ -> {:ok, true} end
@@ -121,10 +121,7 @@ defmodule RS.Trip.Graph do
             :and,
             [
               {:location_driver, &provided?/1},
-              {:current_location_label,
-               fn x ->
-                 x.node_value == pickup_point_label()
-               end}
+              {:current_location_label, &at_pick_up?/1}
             ]
           }),
           fn _ -> {:ok, true} end
@@ -135,10 +132,7 @@ defmodule RS.Trip.Graph do
             :and,
             [
               {:location_driver, &provided?/1},
-              {:current_location_label,
-               fn x ->
-                 x.node_value == dropoff_point_label()
-               end}
+              {:current_location_label, &at_drop_off?/1}
             ]
           }),
           fn _ -> {:ok, true} end
@@ -177,7 +171,7 @@ defmodule RS.Trip.Graph do
 
         # Continuously polling for driver's location and updating `location_driver`.
         schedule_recurring(
-          :driver_location_current_schedule,
+          :driver_location_current_timer,
           unblocked_when({
             :and,
             [
@@ -191,7 +185,7 @@ defmodule RS.Trip.Graph do
         ),
         mutate(
           :driver_location_current_update,
-          [:driver_location_current_schedule],
+          [:driver_location_current_timer],
           &fetch_simulated_current_location/1,
           mutates: :location_driver,
           update_revision_on_change: true
@@ -199,13 +193,13 @@ defmodule RS.Trip.Graph do
 
         # Wait for the customer to come out and pickup the item for a few minutes.
         schedule_once(
-          :done_waiting_for_customer_schedule,
+          :done_waiting_for_customer_timer,
           unblocked_when(:waiting_for_customer_at_dropoff, &true?/1),
           &in_five_minutes/1
         ),
         mutate(
           :done_waiting_for_customer,
-          [:done_waiting_for_customer_schedule, :waiting_for_customer_at_dropoff],
+          [:done_waiting_for_customer_timer, :waiting_for_customer_at_dropoff],
           &record_driver_asked_for_customer_to_leave/1,
           mutates: :dropped_off,
           update_revision_on_change: true

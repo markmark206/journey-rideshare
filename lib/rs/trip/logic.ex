@@ -1,6 +1,22 @@
 defmodule RS.Trip.Logic do
   require Logger
 
+  def en_route?(x) do
+    x.node_value == en_route_label()
+  end
+
+  def at_starting_point?(x) do
+    x.node_value == starting_point_label()
+  end
+
+  def at_drop_off?(x) do
+    x.node_value == dropoff_point_label()
+  end
+
+  def at_pick_up?(x) do
+    x.node_value == pickup_point_label()
+  end
+
   def starting_point_label(), do: "starting point"
   def pickup_point_label(), do: "pickup point"
   def dropoff_point_label(), do: "drop off point"
