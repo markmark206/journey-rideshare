@@ -3,25 +3,23 @@ defmodule RS.Trip do
 
   def new(
         driver_id,
-        passenger_id,
+        order_id,
         driver_location,
-        pickup_location,
-        dropoff_location,
-        price \\ nil
+        location_pickup,
+        location_dropoff,
+        price_cents \\ nil
       ) do
-    price = if is_nil(price), do: (dropoff_location - pickup_location) * 20, else: price
-
     Logger.info("""
     Starting a new trip.
 
     Driver: #{driver_id}
     Current Driver Location: #{driver_location}
 
-    Passenger: #{passenger_id}
-    Pickup Location: #{pickup_location}
-    Dropoff Location: #{dropoff_location}
+    Order: #{order_id}
+    Pickup Location: #{location_pickup}
+    Dropoff Location: #{location_dropoff}
 
-    Price: $#{price}
+    Price: $#{price_cents / 100}
     """)
 
     trip =
@@ -29,11 +27,12 @@ defmodule RS.Trip do
       |> Journey.start_execution()
       |> Journey.set(%{
         driver_id: driver_id,
-        passenger_id: passenger_id,
-        driver_location_current: driver_location,
-        pickup_location: pickup_location,
-        dropoff_location: dropoff_location,
-        price: price
+        order_id: order_id,
+        location_driver_initial: driver_location,
+        location_driver: driver_location,
+        location_pickup: location_pickup,
+        location_dropoff: location_dropoff,
+        price_cents: price_cents
       })
 
     trip.id
