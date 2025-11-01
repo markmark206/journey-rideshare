@@ -1,8 +1,33 @@
 defmodule RS.Trip.Logic do
   require Logger
 
+  def en_route?(x) do
+    x.node_value == en_route_label()
+  end
+
+  def at_starting_point?(x) do
+    x.node_value == starting_point_label()
+  end
+
+  def at_drop_off?(x) do
+    x.node_value == dropoff_point_label()
+  end
+
+  def at_pick_up?(x) do
+    x.node_value == pickup_point_label()
+  end
+
+  def starting_point_label(), do: "starting point"
+  def pickup_point_label(), do: "pickup point"
+  def dropoff_point_label(), do: "drop off point"
+  def en_route_label(), do: "en route"
+
   def in_five_seconds(_) do
     {:ok, System.system_time(:second) + 5}
+  end
+
+  def in_five_minutes(_) do
+    {:ok, System.system_time(:second) + 1 * 60}
   end
 
   def ask_navigation_subsystem_for_eta(location1, location2) do
@@ -14,49 +39,54 @@ defmodule RS.Trip.Logic do
   end
 
   def update_pickup_eta(%{
-        driver_location_current: driver_location_current,
-        pickup_location: pickup_location
+        location_driver: location_driver,
+        location_pickup: location_pickup,
+        execution_id: execution_id
       })
-      when driver_location_current != pickup_location do
-    eta = ask_navigation_subsystem_for_eta(driver_location_current, pickup_location)
+      when location_driver != location_pickup do
+    eta = ask_navigation_subsystem_for_eta(location_driver, location_pickup)
 
     Logger.info(
-      "Driving to pickup location #{pickup_location}. Currently at: #{driver_location_current}. ETA: in #{eta}."
+      "#{execution_id}: Driving to pickup location #{location_pickup}. Currently at: #{location_driver}. ETA: in #{eta}."
     )
 
     {:ok, eta}
   end
 
-  def update_pickup_eta(%{pickup_location: pickup_location}) do
-    Logger.info("Waiting for passenger at pickup location #{pickup_location}.")
+  def update_pickup_eta(%{location_pickup: location_pickup, execution_id: execution_id}) do
+    Logger.info("#{execution_id}: Waiting at pickup location #{location_pickup}.")
     {:ok, 0}
   end
 
   def update_dropoff_eta(%{
-        driver_location_current: driver_location_current,
-        dropoff_location: dropoff_location
+        location_driver: location_driver,
+        location_dropoff: location_dropoff,
+        execution_id: execution_id
       })
-      when driver_location_current != dropoff_location do
-    eta = ask_navigation_subsystem_for_eta(driver_location_current, dropoff_location)
+      when location_driver != location_dropoff do
+    eta = ask_navigation_subsystem_for_eta(location_driver, location_dropoff)
 
     Logger.info(
-      "Driving passenger to drop off location #{dropoff_location}. Currently at #{driver_location_current}. ETA: in #{eta}."
+      "#{execution_id}: Driving item to drop off location #{location_dropoff}. Currently at #{location_driver}. ETA: in #{eta}."
     )
 
     {:ok, eta}
   end
 
-  def update_dropoff_eta(%{dropoff_location: dropoff_location}) do
-    Logger.info("Waiting for passenger to exit the vehicle at the drop off location #{dropoff_location}.")
+  def update_dropoff_eta(%{location_dropoff: location_dropoff, execution_id: execution_id}) do
+    Logger.info(
+      "#{execution_id}: Waiting for the customer to come pick up the item at the drop off location #{location_dropoff}."
+    )
+
     {:ok, 0}
   end
 
   def fetch_simulated_current_location(%{driver_reported_pickup_time: _} = values) do
-    # The passenger has been picked up, so we are driving to the drop off location.
-    last_position = Map.get(values, :driver_location_current)
+    # The item has been picked up, so we are driving to the drop off location.
+    last_position = Map.get(values, :location_driver)
 
     new_position =
-      if last_position == values.dropoff_location do
+      if last_position == values.location_dropoff do
         # We have arrived, don't go anywhere.
         last_position
       else
@@ -67,11 +97,11 @@ defmodule RS.Trip.Logic do
   end
 
   def fetch_simulated_current_location(values) do
-    # The passenger has not been picked up, so we are driving to the pickup location.
-    last_position = Map.get(values, :driver_location_current)
+    # The item has not been picked up, so we are driving to the pickup location.
+    last_position = Map.get(values, :location_driver)
 
     new_position =
-      if last_position == values.pickup_location do
+      if last_position == values.location_pickup do
         # We have arrived, don't go anywhere.
         last_position
       else
@@ -81,27 +111,98 @@ defmodule RS.Trip.Logic do
     {:ok, new_position}
   end
 
-  def process_payment(%{passenger_id: passenger_id, driver_id: driver_id, price: price}) do
+  def compute_location_label(x) do
+    location_label =
+      cond do
+        Map.get(x, :location_driver_initial) == x.location_driver ->
+          starting_point_label()
+
+        Map.get(x, :location_pickup) == x.location_driver ->
+          pickup_point_label()
+
+        Map.get(x, :location_dropoff) == x.location_driver ->
+          dropoff_point_label()
+
+        true ->
+          en_route_label()
+      end
+
+    {:ok, location_label}
+  end
+
+  def process_payment(%{order_id: order_id, driver_id: driver_id, price_cents: price_cents, execution_id: execution_id}) do
     Logger.info("""
-    Passenger dropped off.
-    Charging passenger `#{passenger_id}` $#{price}, to driver `#{driver_id}`.
+    #{execution_id}:
+    Item dropped off.
+    Charging `#{order_id}` $#{price_cents / 100}, to driver `#{driver_id}`.
     The trip is now complete.
     """)
 
-    {:ok, "charged $#{price}. passenger `#{passenger_id}`, driver `#{driver_id}`"}
+    {:ok, "charged $#{price_cents / 100}. pickup `#{order_id}`, driver `#{driver_id}`"}
   end
 
   def now(_) do
     {:ok, System.system_time(:second)}
   end
 
-  def record_pickup_time(_) do
-    Logger.info("Driver picked up the passenger, at #{inspect(DateTime.now!("America/Los_Angeles"))}.")
+  def record_pickup_time(%{execution_id: execution_id}) do
+    Logger.info("#{execution_id}: Driver picked up the item, at #{inspect(DateTime.now!("America/Los_Angeles"))}.")
     {:ok, System.system_time(:second)}
   end
 
-  def record_dropoff_time(_) do
-    Logger.info("Driver dropped off the passenger, at #{inspect(DateTime.now!("America/Los_Angeles"))}.")
+  def record_dropoff_time(%{execution_id: execution_id}) do
+    Logger.info(
+      "#{execution_id}: Driver handed the item off to the customer, at #{inspect(DateTime.now!("America/Los_Angeles"))}."
+    )
+
     {:ok, System.system_time(:second)}
+  end
+
+  def record_driver_cancelled_time_after_waiting_for_food_at_restaurant(%{execution_id: execution_id}) do
+    Logger.info(
+      "#{execution_id}: Driver cancelled the trip after waiting for pickup item to become available, at #{inspect(DateTime.now!("America/Los_Angeles"))}."
+    )
+
+    {:ok, System.system_time(:second)}
+  end
+
+  def record_driver_asked_for_customer_to_leave(%{execution_id: execution_id}) do
+    Logger.info(
+      "#{execution_id}: The customer didn't come out, the driver dropped off the item, at #{inspect(DateTime.now!("America/Los_Angeles"))}."
+    )
+
+    {:ok, true}
+  end
+
+  def driver_at_restaurant(%{
+        location_driver: location_driver,
+        location_pickup: location_pickup,
+        execution_id: execution_id
+      }) do
+    if location_driver == location_pickup do
+      Logger.info("#{execution_id}: Driver is at pickup location #{location_pickup}")
+      {:ok, true}
+    else
+      {:ok, false}
+    end
+  end
+
+  def driver_at_dropoff_location(%{
+        location_driver: location_driver,
+        location_dropoff: location_dropoff,
+        execution_id: execution_id
+      }) do
+    if location_driver == location_dropoff do
+      Logger.info("#{execution_id}: Driver is at dropoff location #{location_dropoff}")
+      {:ok, true}
+    else
+      {:ok, false}
+    end
+  end
+
+  def notify_pubsub_of_trip_update(trip, node_name, _values) do
+    Logger.debug("#{trip}: Notifying pubsub of trip update #{node_name}")
+    Phoenix.PubSub.broadcast(Rs.PubSub, "trip:#{trip}", {:trip_updated, trip, node_name})
+    {:ok, "trip updated"}
   end
 end

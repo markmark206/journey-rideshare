@@ -1,0 +1,58 @@
+<div class={if @embedded?, do: "space-y-6", else: "mx-auto max-w-2xl space-y-6"}>
+  <div :if={@connected?} class="space-y-4">
+    <RsWeb.Live.Components.TripCard.render
+      :if={@trip_values != nil and @embedded?}
+      trip_values={@trip_values}
+      trip={@trip}
+      embedded={true}
+      last_updated_seconds_ago={@last_updated_seconds_ago}
+    />
+    <div
+      :if={@trip_values != nil and not @embedded?}
+      id={"trip-detailed-status-#{@trip}-id"}
+      class={section()}
+    >
+      <RsWeb.Live.Components.TripCard.render trip_values={@trip_values} trip={@trip} embedded={false} last_updated_seconds_ago={@last_updated_seconds_ago} />
+
+      <div :if={@show_details} class={section2()}>
+        <div class={list_element()}>Driver: <span class={data_point_no_border()}>{@trip_values.driver_id}</span></div>
+        <div class={list_element()}>
+          Order: <span class={data_point_no_border()}>{@trip_values.order_id}</span>
+        </div>
+        <div class={list_element()}>
+          Starting point: <span class={data_point_no_border()}>{@trip_values.location_driver_initial}</span>
+        </div>
+        <div class={list_element()}>
+          Pickup point: <span class={data_point_no_border()}>{@trip_values.location_pickup}</span>
+        </div>
+        <div class={list_element()}>
+          Dropoff point: <span class={data_point_no_border()}>{@trip_values.location_dropoff}</span>
+        </div>
+        <div class={list_element()}>
+          Price: <span class={data_point_no_border()}>${@trip_values.price_cents / 100}</span>
+        </div>
+      </div>
+
+      <div :if={@trip_values.trip_history != nil and @show_details} class={section2()}>
+        History:
+        <%= for %{"node" => node, "timestamp" => timestamp, "value" => value} <- @trip_values.trip_history |> Enum.reverse() do %>
+          <div class="text-xs font-mono">
+            <span class="text-info">{to_datetime_string(timestamp, @time_zone)}:</span> {node}
+            <span class="text-info">{value}</span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div
+      :if={@trip_values != nil and @show_details}
+      id={"trip-values-#{@trip}-id"}
+      class={section()}
+    >
+      <h1 class={section_title()}>Raw Trip Values</h1>
+      <div class={section2()}>
+        <pre class="whitespace-pre-wrap break-words">{"#{inspect(@trip_values, pretty: true)}"}</pre>
+      </div>
+    </div>
+  </div>
+</div>

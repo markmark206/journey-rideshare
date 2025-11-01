@@ -1,6 +1,6 @@
-## Rideshare Trip Workflow Demo
+## Delivery Trip Workflow Demo
 
-This example models a basic rideshare trip workflow -- driving to pickup location, passenger pickup, driving to destination, passenger drop off, payment.
+This example models a basic delivery trip workflow -- driving to pickup location, passenger pickup, driving to destination, passenger drop off, payment.
 
 The definition of the workflow can be found in [lib/rs/trip/graph.ex](./lib/rs/trip/graph.ex), and the example below illustrates running an execution of this workflow, which gets created once the drivver and the passenger get matched.
 
@@ -23,84 +23,157 @@ Once Luigi is picked up, the driver takes Luigi to the drop off spot -- the logs
 Once Mario and Luigi arrive at the drop off spot, and Luigi exits the vehicle, Mario marks the passenger as dropped off, thus completing the trip, and triggering the payment.
 
 ```elixir
-~/src/rideshare/rs $ iex -S mix
+[markmark ~/src/delivery/rs] $ iex -S mix
 Erlang/OTP 27 [erts-15.2.3] [source] [64-bit] [smp:10:10] [ds:10:10:10] [async-threads:1] [jit]
 
-2025-10-26 12:30:55.813 Migrations already up
+2025-10-31 07:50:29.341 [info] Migrations already up
 Interactive Elixir (1.19.1) - press Ctrl+C to exit (type h() ENTER for help)
-iex(1)> driver = RS.Driver.new("Mario")
-"DRIVERVXB7BZT2RLL9L6VBRDDM"
-iex(2)> passenger = RS.Passenger.new("Luigi")
-"PASSENGER3TMJ027H0795M8YAE3AA"
-iex(3)> trip = RS.Trip.new(driver, passenger, 10, 19, 25, 98)
-2025-10-26 12:31:33.940 Starting a new trip.
+iex(1)> trip = RS.Trip.new("driver1", "order1", 10, 19, 25, 98)
+2025-10-31 07:51:16.301 [info] Starting a new trip.
 
-Driver: DRIVERVXB7BZT2RLL9L6VBRDDM
+Driver: driver1
 Current Driver Location: 10
 
-Passenger: PASSENGER3TMJ027H0795M8YAE3AA
+Order: order1
 Pickup Location: 19
 Dropoff Location: 25
 
-Price: $98
+Price: $0.98
 
-"TRIPZY8Z221TE99GBTEY26RZ"
-2025-10-26 12:31:38.990 Driving to pickup location 19. Currently at: 10. ETA: in 9.
-2025-10-26 12:31:44.037 Driving to pickup location 19. Currently at: 11. ETA: in 8.
-2025-10-26 12:31:44.052 Driving to pickup location 19. Currently at: 12. ETA: in 7.
-2025-10-26 12:31:49.075 Driving to pickup location 19. Currently at: 12. ETA: in 7.
-2025-10-26 12:31:54.120 Driving to pickup location 19. Currently at: 14. ETA: in 5.
-2025-10-26 12:31:54.140 Driving to pickup location 19. Currently at: 15. ETA: in 4.
-2025-10-26 12:31:59.168 Driving to pickup location 19. Currently at: 15. ETA: in 4.
-2025-10-26 12:32:04.207 Driving to pickup location 19. Currently at: 17. ETA: in 2.
-2025-10-26 12:32:04.226 Driving to pickup location 19. Currently at: 18. ETA: in 1.
-2025-10-26 12:32:09.235 Driving to pickup location 19. Currently at: 18. ETA: in 1.
-2025-10-26 12:32:14.277 Waiting for passenger at pickup location 19.
-2025-10-26 12:32:19.344 Waiting for passenger at pickup location 19.
-2025-10-26 12:32:19.363 Waiting for passenger at pickup location 19.
-2025-10-26 12:32:24.402 Waiting for passenger at pickup location 19.
-iex(4)> Journey.set(trip, :picked_up, true); :ok
+2025-10-31 07:51:16.391 [info] TRIP4862ELGAYZXDYL7A95H9: Driving to pickup location 19. Currently at: 10. ETA: in 9.
+"TRIP4862ELGAYZXDYL7A95H9"
+2025-10-31 07:51:21.635 [info] TRIP4862ELGAYZXDYL7A95H9: Driving to pickup location 19. Currently at: 11. ETA: in 8.
+2025-10-31 07:51:26.696 [info] TRIP4862ELGAYZXDYL7A95H9: Driving to pickup location 19. Currently at: 12. ETA: in 7.
+2025-10-31 07:51:26.718 [info] TRIP4862ELGAYZXDYL7A95H9: Driving to pickup location 19. Currently at: 12. ETA: in 7.
+2025-10-31 07:51:31.748 [info] TRIP4862ELGAYZXDYL7A95H9: Driving to pickup location 19. Currently at: 13. ETA: in 6.
+2025-10-31 07:51:36.792 [info] TRIP4862ELGAYZXDYL7A95H9: Driving to pickup location 19. Currently at: 14. ETA: in 5.
+2025-10-31 07:51:36.808 [info] TRIP4862ELGAYZXDYL7A95H9: Driving to pickup location 19. Currently at: 14. ETA: in 5.
+2025-10-31 07:51:41.849 [info] TRIP4862ELGAYZXDYL7A95H9: Driving to pickup location 19. Currently at: 15. ETA: in 4.
+2025-10-31 07:51:41.875 [info] TRIP4862ELGAYZXDYL7A95H9: Driving to pickup location 19. Currently at: 15. ETA: in 4.
+2025-10-31 07:51:46.895 [info] TRIP4862ELGAYZXDYL7A95H9: Driving to pickup location 19. Currently at: 16. ETA: in 3.
+2025-10-31 07:51:51.949 [info] TRIP4862ELGAYZXDYL7A95H9: Driving to pickup location 19. Currently at: 17. ETA: in 2.
+2025-10-31 07:51:51.971 [info] TRIP4862ELGAYZXDYL7A95H9: Driving to pickup location 19. Currently at: 17. ETA: in 2.
+2025-10-31 07:51:56.998 [info] TRIP4862ELGAYZXDYL7A95H9: Driving to pickup location 19. Currently at: 18. ETA: in 1.
+2025-10-31 07:52:02.017 [info] TRIP4862ELGAYZXDYL7A95H9: Waiting at pickup location 19.
+2025-10-31 07:52:02.018 [info] TRIP4862ELGAYZXDYL7A95H9: Driver is at pickup location 19
+iex(2)> Journey.set("TRIP4862ELGAYZXDYL7A95H9", :picked_up, true); :ok
 :ok
-2025-10-26 12:32:32.191 Driver picked up the passenger, at #DateTime<2025-10-26 12:32:32.186429-07:00 PDT America/Los_Angeles>.
-2025-10-26 12:32:39.540 Driving passenger to drop off location 25. Currently at 20. ETA: in 5.
-2025-10-26 12:32:44.584 Driving passenger to drop off location 25. Currently at 21. ETA: in 4.
-2025-10-26 12:32:49.650 Driving passenger to drop off location 25. Currently at 22. ETA: in 3.
-2025-10-26 12:32:54.709 Driving passenger to drop off location 25. Currently at 24. ETA: in 1.
-2025-10-26 12:32:59.766 Waiting for passenger to exit the vehicle at the drop off location 25.
-2025-10-26 12:32:59.796 Waiting for passenger to exit the vehicle at the drop off location 25.
-2025-10-26 12:33:04.816 Waiting for passenger to exit the vehicle at the drop off location 25.
-2025-10-26 12:33:09.860 Waiting for passenger to exit the vehicle at the drop off location 25.
-2025-10-26 12:33:14.892 Waiting for passenger to exit the vehicle at the drop off location 25.
-2025-10-26 12:33:14.906 Waiting for passenger to exit the vehicle at the drop off location 25.
-iex(5)> Journey.set(trip, :dropped_off, true); :ok
-2025-10-26 12:33:15.822 Driver dropped off the passenger, at #DateTime<2025-10-26 12:33:15.822349-07:00 PDT America/Los_Angeles>.
+2025-10-31 07:52:25.552 [info] TRIP4862ELGAYZXDYL7A95H9: Driver picked up the item, at #DateTime<2025-10-31 05:52:25.546099-07:00 PDT America/Los_Angeles>.
+2025-10-31 07:52:25.564 [info] TRIP4862ELGAYZXDYL7A95H9: Driving item to drop off location 25. Currently at 19. ETA: in 6.
+2025-10-31 07:52:27.235 [info] TRIP4862ELGAYZXDYL7A95H9: Driving item to drop off location 25. Currently at 20. ETA: in 5.
+2025-10-31 07:52:32.286 [info] TRIP4862ELGAYZXDYL7A95H9: Driving item to drop off location 25. Currently at 21. ETA: in 4.
+2025-10-31 07:52:37.326 [info] TRIP4862ELGAYZXDYL7A95H9: Driving item to drop off location 25. Currently at 22. ETA: in 3.
+2025-10-31 07:52:42.382 [info] TRIP4862ELGAYZXDYL7A95H9: Driving item to drop off location 25. Currently at 23. ETA: in 2.
+2025-10-31 07:52:47.432 [info] TRIP4862ELGAYZXDYL7A95H9: Driving item to drop off location 25. Currently at 24. ETA: in 1.
+2025-10-31 07:52:52.494 [info] TRIP4862ELGAYZXDYL7A95H9: Waiting for the customer to come pick up the item at the drop off location 25.
+2025-10-31 07:52:52.494 [info] TRIP4862ELGAYZXDYL7A95H9: Driver is at dropoff location 25
+iex(3)> Journey.set("TRIP4862ELGAYZXDYL7A95H9", :dropped_off, true); :ok
+2025-10-31 07:53:04.941 [info] TRIP4862ELGAYZXDYL7A95H9: Driver handed the item off to the customer, at #DateTime<2025-10-31 05:53:04.941658-07:00 PDT America/Los_Angeles>.
 :ok
-2025-10-26 12:33:15.834 Passenger dropped off.
-Charging passenger `PASSENGER3TMJ027H0795M8YAE3AA` $98, to driver `DRIVERVXB7BZT2RLL9L6VBRDDM`.
+2025-10-31 07:53:04.956 [info] TRIP4862ELGAYZXDYL7A95H9:
+Item dropped off.
+Charging `order1` $0.98, to driver `driver1`.
 The trip is now complete.
 
-iex(6)> trip |> Journey.load() |> Journey.values()
+2025-10-31 07:53:04.975 [info] TRIP4862ELGAYZXDYL7A95H9: Notifying pubsub of trip completion
+iex(4)> "TRIP4862ELGAYZXDYL7A95H9" |> Journey.load() |> Journey.values()
 %{
-  driver_id: "DRIVERVXB7BZT2RLL9L6VBRDDM",
-  created_at: 1761507093,
-  execution_id: "TRIPZY8Z221TE99GBTEY26RZ",
-  last_updated_at: 1761507199,
-  driver_location_current: 25,
-  dropoff_location: 25,
-  passenger_id: "PASSENGER3TMJ027H0795M8YAE3AA",
-  pickup_location: 19,
-  price: 98,
+  driver_id: "driver1",
+  created_at: 1761915076,
+  order_id: "order1",
+  location_driver_initial: 10,
+  location_driver: 25,
+  location_pickup: 19,
+  location_dropoff: 25,
+  price_cents: 98,
+  driver_reported_pickup_time: 1761915145,
   picked_up: true,
-  driver_reported_pickup_time: 1761507152,
   dropped_off: true,
-  driver_reported_dropoff_time: 1761507195,
-  pickup_eta_schedule: 1761507154,
-  dropoff_eta_schedule: 1761507199,
-  driver_location_current_schedule: 1761507199,
-  driver_location_current_update: "updated :driver_location_current",
-  payment: "charged $98. passenger `PASSENGER3TMJ027H0795M8YAE3AA`, driver `DRIVERVXB7BZT2RLL9L6VBRDDM`"
+  done_waiting_for_food_at_restaurant_schedule: 1761915182,
+  driver_reported_dropoff_time: 1761915184,
+  current_location_label: "drop off point",
+  reached_dropoff_location: true,
+  trip_completed_at: 1761915184,
+  driver_location_current_schedule: 1761915187,
+  driver_location_current_update: "updated :location_driver",
+  done_waiting_for_customer_schedule: 1761915232,
+  payment: "charged $0.98. pickup `order1`, driver `driver1`",
+  trip_history: [
+    %{
+      "metadata" => nil,
+      "node" => "trip_completed_at",
+      "revision" => 309,
+      "timestamp" => 1761915184,
+      "value" => 1761915184
+    },
+    %{
+      "metadata" => nil,
+      "node" => "payment",
+      "revision" => 305,
+      "timestamp" => 1761915184,
+      "value" => "charged $0.98. pickup `order1`, driver `driver1`"
+    },
+    %{
+      "metadata" => nil,
+      "node" => "dropped_off",
+      "revision" => 297,
+      "timestamp" => 1761915184,
+      "value" => true
+    },
+    %{
+      "metadata" => nil,
+      "node" => "reached_dropoff_location",
+      "revision" => 286,
+      "timestamp" => 1761915172,
+      "value" => true
+    },
+    %{
+      "metadata" => nil,
+      "node" => "en_route",
+      "revision" => 208,
+      "timestamp" => 1761915147,
+      "value" => true
+    },
+    %{
+      "metadata" => nil,
+      "node" => "picked_up",
+      "revision" => 180,
+      "timestamp" => 1761915145,
+      "value" => true
+    },
+    %{
+      "metadata" => nil,
+      "node" => "reached_restaurant",
+      "revision" => 161,
+      "timestamp" => 1761915122,
+      "value" => true
+    },
+    %{
+      "metadata" => nil,
+      "node" => "en_route",
+      "revision" => 35,
+      "timestamp" => 1761915081,
+      "value" => true
+    },
+    %{
+      "metadata" => nil,
+      "node" => "at_starting_point",
+      "revision" => 15,
+      "timestamp" => 1761915076,
+      "value" => true
+    },
+    %{
+      "metadata" => nil,
+      "node" => "location_driver_initial",
+      "revision" => 3,
+      "timestamp" => 1761915076,
+      "value" => 10
+    }
+  ],
+  execution_id: "TRIP4862ELGAYZXDYL7A95H9",
+  last_updated_at: 1761915187
 }
-iex(7)>
+iex(5)>
 ```
 
 # Rs
@@ -121,5 +194,3 @@ Ready to run in production? Please [check our deployment guides](https://hexdocs
 * Docs: https://hexdocs.pm/phoenix
 * Forum: https://elixirforum.com/c/phoenix-forum
 * Source: https://github.com/phoenixframework/phoenix
-
-
