@@ -1,4 +1,5 @@
 defmodule RS.Trip do
+  @moduledoc false
   require Logger
 
   def new(

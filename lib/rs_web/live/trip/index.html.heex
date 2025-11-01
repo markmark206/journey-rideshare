@@ -12,7 +12,12 @@
       id={"trip-detailed-status-#{@trip}-id"}
       class={section()}
     >
-      <RsWeb.Live.Components.TripCard.render trip_values={@trip_values} trip={@trip} embedded={false} last_updated_seconds_ago={@last_updated_seconds_ago} />
+      <RsWeb.Live.Components.TripCard.render
+        trip_values={@trip_values}
+        trip={@trip}
+        embedded={false}
+        last_updated_seconds_ago={@last_updated_seconds_ago}
+      />
 
       <div :if={@show_details} class={section2()}>
         <div class={list_element()}>Driver: <span class={data_point_no_border()}>{@trip_values.driver_id}</span></div>

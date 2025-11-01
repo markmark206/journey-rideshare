@@ -1,4 +1,5 @@
 defmodule RsWeb.Live.Home.Index do
+  @moduledoc false
   use RsWeb, :live_view
 
   require Logger

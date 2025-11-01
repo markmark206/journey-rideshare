@@ -1,4 +1,5 @@
 defmodule RS.Trip.Logic do
+  @moduledoc false
   require Logger
 
   def en_route?(x) do

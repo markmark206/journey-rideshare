@@ -1,4 +1,5 @@
 defmodule RS.Trip.Graph do
+  @moduledoc false
   import Journey.Node
   import Journey.Node.Conditions
   import Journey.Node.UpstreamDependencies

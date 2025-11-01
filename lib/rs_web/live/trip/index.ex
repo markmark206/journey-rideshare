@@ -1,4 +1,5 @@
 defmodule RsWeb.Live.Trip.Index do
+  @moduledoc false
   use RsWeb, :live_view
 
   import RsWeb.Live.Classes
