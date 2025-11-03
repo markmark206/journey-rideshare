@@ -18,6 +18,7 @@ defmodule RsWeb.Live.Home.Index do
     socket =
       assign(socket, connected?: connected?)
       |> assign(time_zone: time_zone)
+      |> assign(:view_analytics, false)
       |> mount_with_connected(params, session, connected?)
 
     {:ok, socket}
@@ -45,9 +46,16 @@ defmodule RsWeb.Live.Home.Index do
       all_trips
       |> Enum.map(fn execution -> execution.id end)
 
+    graph = RS.Trip.Graph.graph()
+
+    analytics_text =
+      Journey.Insights.FlowAnalytics.flow_analytics(graph.name, graph.version)
+      |> Journey.Insights.FlowAnalytics.to_text()
+
     socket
     |> assign(trips: trips)
     |> assign(trips_in_progress: trips_in_progress)
+    |> assign(:analytics, analytics_text)
   end
 
   def mount_with_connected(socket, _params, _session, connected?) when connected? == true do
@@ -60,7 +68,17 @@ defmodule RsWeb.Live.Home.Index do
 
   def mount_with_connected(socket, _params, _session, connected?) when connected? == false do
     Logger.debug("Not connected to LiveView")
-    socket |> assign(trips: [])
+    socket |> assign(trips: []) |> assign(:analytics, "")
+  end
+
+  def handle_event("on-toggle-view-analytics-click" = event, _params, socket) do
+    Logger.info(event)
+
+    socket =
+      socket
+      |> assign(:view_analytics, not socket.assigns.view_analytics)
+
+    {:noreply, socket}
   end
 
   def handle_event("on_start_trip_button_click", _params, socket) do
@@ -159,6 +177,30 @@ defmodule RsWeb.Live.Home.Index do
           <div class="mx-auto max-w-2xl flex justify-center px-3">
             <div class="text-sm font-mono border-1 rounded-md mt-3 p-4 bg-base-100 w-full">
               Trips in progress: <span class="font-mono badge badge-neutral">{@trips_in_progress}</span>
+              <div class="pt-2">
+                <div
+                  id="form-show-analytics-id"
+                  phx-click="on-toggle-view-analytics-click"
+                  class="hover:bg-info p-2 rounded-md"
+                >
+                  <.icon
+                    :if={not @view_analytics}
+                    name="hero-chevron-down"
+                    class="w-4 h-4 p-1 "
+                  />
+                  <.icon
+                    :if={@view_analytics}
+                    name="hero-chevron-up"
+                    class="w-4 h-4 p-1"
+                  /> View Analytics
+                </div>
+              </div>
+
+              <pre
+                :if={@view_analytics}
+                id="analytics-id"
+                class="border-1 p-3 bg-neutral rounded-md my-2 whitespace-pre-wrap break-words"
+              >{@analytics}</pre>
             </div>
           </div>
 
