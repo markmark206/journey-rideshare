@@ -22,6 +22,9 @@
       <div :if={@show_details} class={section2()}>
         <div class={list_element()}>Driver: <span class={data_point_no_border()}>{@trip_values.driver_id}</span></div>
         <div class={list_element()}>
+          Started in Time Zone: <span class={data_point_no_border()}>{@trip_values.started_in_time_zone}</span>
+        </div>
+        <div class={list_element()}>
           Order: <span class={data_point_no_border()}>{@trip_values.order_id}</span>
         </div>
         <div class={list_element()}>

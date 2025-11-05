@@ -18,6 +18,7 @@ defmodule RS.Trip.Graph do
         compute(:created_at, [], &now/1),
 
         # Initial parameters of the trip.
+        input(:started_in_time_zone),
         input(:driver_id),
         input(:order_id),
 
