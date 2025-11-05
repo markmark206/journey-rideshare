@@ -65,7 +65,7 @@ defmodule RS.Trip.Graph do
         ),
 
         # Wait for the food at the restaurant.
-        schedule_once(
+        tick_once(
           :done_waiting_for_food_at_restaurant_timer,
           unblocked_when(:waiting_for_food_at_restaurant, &true?/1),
           &in_five_minutes/1
@@ -174,7 +174,7 @@ defmodule RS.Trip.Graph do
         ),
 
         # Continuously polling for driver's location and updating `location_driver`.
-        schedule_recurring(
+        tick_recurring(
           :driver_location_current_timer,
           unblocked_when({
             :and,
@@ -196,7 +196,7 @@ defmodule RS.Trip.Graph do
         ),
 
         # Wait for the customer to come out and pickup the item for a few minutes.
-        schedule_once(
+        tick_once(
           :done_waiting_for_customer_timer,
           unblocked_when(:waiting_for_customer_at_dropoff, &true?/1),
           &in_five_minutes/1
