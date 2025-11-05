@@ -55,7 +55,7 @@ jobs:
       - name: Install OTP and Elixir
         uses: erlef/setup-beam@v1
         with:
-          elixir-version: "1.18"
+          elixir-version: "1.19.1"
           otp-version: "27.2"
       - name: Manage dependencies cache
         uses: actions/cache@v4
