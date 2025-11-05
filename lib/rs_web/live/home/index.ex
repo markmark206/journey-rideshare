@@ -129,7 +129,8 @@ defmodule RsWeb.Live.Home.Index do
         location_pickup,
         location_dropoff,
         price_cents,
-        pickup_item
+        pickup_item,
+        socket.assigns.time_zone
       )
 
     :ok = Phoenix.PubSub.broadcast(Rs.PubSub, "new_trips", {:trip_created, trip})
