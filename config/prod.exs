@@ -8,6 +8,7 @@ import Config
 config :rs, RsWeb.Endpoint,
   cache_static_manifest: "priv/static/cache_manifest.json",
   check_origin: [
+    "https://delivery-demo-6hrmbwesca-wm.a.run.app",
     "https://delivery.demo.gojourney.dev",
     "//localhost"
   ]
