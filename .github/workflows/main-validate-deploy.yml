@@ -36,8 +36,7 @@ jobs:
       run: |-
         DOCKER_BUILDKIT=1 docker build \
           --build-arg COMMIT_SHA=${{ github.sha }} \
-          --tag "${{ env.GOOGLE_ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{
-env.GOOGLE_ARTIFACT_REGISTRY_NAME }}/${{ env.SERVICE }}:${{ github.sha }}" \
+          --tag "${{ env.GOOGLE_ARTIFACT_REGISTRY_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{env.GOOGLE_ARTIFACT_REGISTRY_NAME }}/${{ env.SERVICE }}:${{ github.sha }}" \
           ./
 
     - name: Build and Push Container
