@@ -12,4 +12,17 @@ defmodule RS.Helpers do
   def random_email(prefix \\ "", domain \\ "@example.com") do
     (random_string(prefix) <> domain) |> String.downcase()
   end
+
+  def to_datetime_string!(unix_timestamp, time_zone, include_date \\ true)
+
+  def to_datetime_string!(unix_timestamp, nil, include_date) do
+    to_datetime_string!(unix_timestamp, "Etc/UTC", include_date)
+  end
+
+  def to_datetime_string!(unix_timestamp, time_zone, include_date) do
+    unix_timestamp
+    |> DateTime.from_unix!()
+    |> DateTime.shift_zone!(time_zone)
+    |> Calendar.strftime(if include_date, do: "%Y-%m-%d %H:%M:%S", else: "%H:%M:%S")
+  end
 end
