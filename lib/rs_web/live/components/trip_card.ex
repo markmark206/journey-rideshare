@@ -28,7 +28,9 @@ defmodule RsWeb.Live.Components.TripCard do
         }
       >
         <h1 class="mb-2 pb-2 flex items-center">
-          <span><span class={data_point()}>{@trip}</span></span>
+          <span>
+            <span class={data_point()}>{@trip}</span><span class="badge badge-neutral">{@trip_values.item_to_deliver}</span>
+          </span>
           <span :if={@trip_values.trip_completed_at == nil} class="ml-auto flex items-center gap-2">
             <span class="font-mono badge badge-info">in progress</span>
             <span class="font-mono status status-info status-md animate-pulse"></span>
@@ -120,7 +122,7 @@ defmodule RsWeb.Live.Components.TripCard do
           </.button>
         </div>
 
-        <div class="font-mono my-1 py-1 text-xs">
+        <div :if={false} class="font-mono my-1 py-1 text-xs">
           <div class="">
             <span>
               {to_datetime_string!(@trip_values.created_at, @trip_values.started_in_time_zone)}
