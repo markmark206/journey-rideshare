@@ -77,10 +77,10 @@ defmodule RsWeb.Live.Trip.Index do
     Logger.info("#{trip}: on_handoff_item_button_click")
 
     Task.start(fn ->
-      Journey.set(trip, :dropped_off, true)
+      Journey.set(trip, :handed_off, true)
     end)
 
-    update_values = Map.put(socket.assigns.trip_values, :dropped_off, true)
+    update_values = Map.put(socket.assigns.trip_values, :handed_off, true)
     socket = assign(socket, :trip_values, update_values)
 
     {:noreply, socket}

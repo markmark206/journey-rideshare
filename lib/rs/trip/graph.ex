@@ -44,8 +44,7 @@ defmodule RS.Trip.Graph do
               {:location_driver, &provided?/1},
               {:picked_up, fn x -> not provided?(x) end},
               {:driver_cancelled_time, fn x -> not provided?(x) end},
-              {:restaurant_cancelled_time, fn x -> not provided?(x) end},
-              {:driver_reported_pickup_time, fn x -> not provided?(x) end}
+              {:restaurant_cancelled_time, fn x -> not provided?(x) end}
             ]
           }),
           &driver_at_restaurant/1
@@ -69,7 +68,7 @@ defmodule RS.Trip.Graph do
         tick_once(
           :waiting_for_food_at_restaurant_timer,
           unblocked_when(:waiting_for_food_at_restaurant, &true?/1),
-          &in_five_minutes/1
+          &in_a_minute/1
         ),
         mutate(
           :waiting_for_food_at_restaurant_timeout,
@@ -88,9 +87,8 @@ defmodule RS.Trip.Graph do
 
         # When the driver picks up or drops off the food, record the time.
         input(:picked_up),
-        compute(:driver_reported_pickup_time, [:picked_up], &record_pickup_time/1),
         input(:dropped_off),
-        compute(:driver_reported_dropoff_time, [:dropped_off], &record_dropoff_time/1),
+        input(:handed_off),
 
         # Determine notable locations. staring point? pickup point? drop off point?
         compute(
@@ -152,7 +150,7 @@ defmodule RS.Trip.Graph do
               {:location_driver, &provided?/1},
               {:driver_cancelled_time, fn x -> not provided?(x) end},
               {:restaurant_cancelled_time, fn x -> not provided?(x) end},
-              {:driver_reported_pickup_time, fn x -> not provided?(x) end}
+              {:picked_up, fn x -> not true?(x) end}
             ]
           }),
           &update_pickup_eta/1
@@ -167,8 +165,9 @@ defmodule RS.Trip.Graph do
               {:location_driver, &provided?/1},
               {:driver_cancelled_time, fn x -> not provided?(x) end},
               {:restaurant_cancelled_time, fn x -> not provided?(x) end},
-              {:driver_reported_pickup_time, fn x -> provided?(x) end},
-              {:driver_reported_dropoff_time, fn x -> not provided?(x) end}
+              {:picked_up, fn x -> not true?(x) end},
+              {:dropped_off, fn x -> not true?(x) end},
+              {:handed_off, fn x -> not true?(x) end}
             ]
           }),
           &update_dropoff_eta/1
@@ -183,7 +182,8 @@ defmodule RS.Trip.Graph do
               {:trip_completed_at, fn x -> not provided?(x) end},
               {:driver_cancelled_time, fn x -> not provided?(x) end},
               {:restaurant_cancelled_time, fn x -> not provided?(x) end},
-              {:driver_reported_dropoff_time, fn x -> not provided?(x) end}
+              {:dropped_off, fn x -> not true?(x) end},
+              {:handed_off, fn x -> not true?(x) end}
             ]
           }),
           &in_five_seconds/1
@@ -200,18 +200,41 @@ defmodule RS.Trip.Graph do
         tick_once(
           :waiting_for_customer_timer,
           unblocked_when(:waiting_for_customer_at_dropoff, &true?/1),
-          &in_five_minutes/1
+          &in_a_minute/1
         ),
         mutate(
           :waiting_for_customer_timeout,
-          [:waiting_for_customer_timer, :waiting_for_customer_at_dropoff],
+          unblocked_when({
+            :and,
+            [
+              {:waiting_for_customer_timer, &provided?/1},
+              {:waiting_for_customer_at_dropoff, &true?/1},
+              {:handed_off, fn x -> not provided?(x) end}
+            ]
+          }),
           &record_driver_asked_for_customer_to_leave/1,
           mutates: :dropped_off,
           update_revision_on_change: true
         ),
 
         # Once the drop off occurred, the payment is processed.
-        compute(:payment, [:driver_reported_dropoff_time, :price_cents], &process_payment/1),
+        compute(
+          :payment,
+          unblocked_when({
+            :and,
+            [
+              {:price_cents, &provided?/1},
+              {
+                :or,
+                [
+                  {:dropped_off, &true?/1},
+                  {:handed_off, &true?/1}
+                ]
+              }
+            ]
+          }),
+          &process_payment/1
+        ),
         compute(
           :trip_completed_at,
           unblocked_when({
@@ -243,6 +266,7 @@ defmodule RS.Trip.Graph do
               {:restaurant_cancelled_time, &provided?/1},
               {:picked_up, &provided?/1},
               {:dropped_off, &provided?/1},
+              {:handed_off, &provided?/1},
               {:payment, &provided?/1},
               {:at_starting_point, &provided?/1},
               {:reached_restaurant, &provided?/1},

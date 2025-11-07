@@ -27,7 +27,7 @@ defmodule RS.Trip.Logic do
     {:ok, System.system_time(:second) + 5}
   end
 
-  def in_five_minutes(_) do
+  def in_a_minute(_) do
     {:ok, System.system_time(:second) + 1 * 60}
   end
 
@@ -82,7 +82,7 @@ defmodule RS.Trip.Logic do
     {:ok, 0}
   end
 
-  def fetch_simulated_current_location(%{driver_reported_pickup_time: _} = values) do
+  def fetch_simulated_current_location(%{picked_up: true} = values) do
     # The item has been picked up, so we are driving to the drop off location.
     last_position = Map.get(values, :location_driver)
 
@@ -146,30 +146,20 @@ defmodule RS.Trip.Logic do
     {:ok, System.system_time(:second)}
   end
 
-  def record_pickup_time(%{execution_id: execution_id}) do
-    Logger.info("#{execution_id}: Driver picked up the item, at #{inspect(DateTime.now!("America/Los_Angeles"))}.")
-    {:ok, System.system_time(:second)}
-  end
-
-  def record_dropoff_time(%{execution_id: execution_id}) do
+  def record_driver_cancelled_time_after_waiting_for_food_at_restaurant(%{
+        execution_id: execution_id,
+        started_in_time_zone: time_zone
+      }) do
     Logger.info(
-      "#{execution_id}: Driver handed the item off to the customer, at #{inspect(DateTime.now!("America/Los_Angeles"))}."
+      "#{execution_id}: Driver cancelled the trip after waiting for pickup item to become available, at #{inspect(DateTime.now!(time_zone))}."
     )
 
     {:ok, System.system_time(:second)}
   end
 
-  def record_driver_cancelled_time_after_waiting_for_food_at_restaurant(%{execution_id: execution_id}) do
+  def record_driver_asked_for_customer_to_leave(%{execution_id: execution_id, started_in_time_zone: time_zone}) do
     Logger.info(
-      "#{execution_id}: Driver cancelled the trip after waiting for pickup item to become available, at #{inspect(DateTime.now!("America/Los_Angeles"))}."
-    )
-
-    {:ok, System.system_time(:second)}
-  end
-
-  def record_driver_asked_for_customer_to_leave(%{execution_id: execution_id}) do
-    Logger.info(
-      "#{execution_id}: The customer didn't come out, the driver dropped off the item, at #{inspect(DateTime.now!("America/Los_Angeles"))}."
+      "#{execution_id}: The customer didn't come out, the driver dropped off the item, at #{inspect(DateTime.now!(time_zone))}."
     )
 
     {:ok, true}

@@ -59,10 +59,10 @@ defmodule RsWeb.Live.Components.TripCard do
                 i == @trip_values.location_pickup and @trip_values.picked_up != true ->
                   @trip_values.pickup_item
 
-                i == @trip_values.location_dropoff and @trip_values.dropped_off == true ->
+                i == @trip_values.location_dropoff and (@trip_values.dropped_off == true or @trip_values.handed_off == true) ->
                   @trip_values.pickup_item
 
-                i == @trip_values.location_dropoff and @trip_values.dropped_off != true ->
+                i == @trip_values.location_dropoff and @trip_values.dropped_off != true and @trip_values.handed_off != true ->
                   "🏠"
 
                 true ->
@@ -82,9 +82,9 @@ defmodule RsWeb.Live.Components.TripCard do
                 <span class="font-mono animate-pulse">🚗</span>
               <% i == @trip_values.location_pickup and @trip_values.waiting_for_food_at_restaurant_timeout != nil -> %>
                 <span class="font-mono">⌛️</span>
-              <% i == @trip_values.location_driver and @trip_values.trip_completed_at != nil and i == @trip_values.location_dropoff and @trip_values.dropped_off and @trip_values.waiting_for_customer_timeout == nil-> %>
+              <% i == @trip_values.location_driver and i == @trip_values.location_dropoff and @trip_values.handed_off -> %>
                 <span class="font-mono">✅</span>
-              <% i == @trip_values.location_driver and @trip_values.trip_completed_at != nil and i == @trip_values.location_dropoff and @trip_values.dropped_off and @trip_values.waiting_for_customer_timeout != nil-> %>
+              <% i == @trip_values.location_driver and i == @trip_values.location_dropoff and @trip_values.dropped_off -> %>
                 <span class="font-mono">📦</span>
               <% i <= @trip_values.location_driver -> %>
                 <span class="font-mono">_</span>
@@ -107,14 +107,16 @@ defmodule RsWeb.Live.Components.TripCard do
             <span :if={@trip_values.picked_up == true}>✅</span> Picked Up
           </.button>
           <.button
-            disabled={@trip_values.waiting_for_customer_at_dropoff != true or @trip_values.trip_completed_at != nil}
+            disabled={
+              @trip_values.waiting_for_customer_timer == nil or
+                (@trip_values.handed_off == true or @trip_values.dropped_off == true)
+            }
             id={"drop-off-item-#{@trip}-id"}
             phx-click="on_handoff_item_button_click"
             phx-value-trip={@trip}
             class="btn btn-sm btn-primary my-2 py-2"
           >
-            <span :if={@trip_values.dropped_off == true and @trip_values.waiting_for_customer_timeout == nil}>✅</span>
-            Handed Off
+            <span :if={@trip_values.handed_off == true}>✅</span> Handed Off
           </.button>
         </div>
 
@@ -122,9 +124,6 @@ defmodule RsWeb.Live.Components.TripCard do
           <div class="">
             <span>
               {to_datetime_string!(@trip_values.created_at, @trip_values.started_in_time_zone)}
-            </span>
-            <span :if={@trip_values.trip_completed_at != nil}>
-              - {to_datetime_string!(@trip_values.trip_completed_at, @trip_values.started_in_time_zone, false)}
             </span>
             <span :if={@trip_values.started_in_time_zone != nil} class="">
               ({@trip_values.started_in_time_zone})
@@ -191,11 +190,17 @@ defmodule RsWeb.Live.Components.TripCard do
             </div>
           </div>
 
-          <span :if={@trip_values.waiting_for_customer_at_dropoff == true} class="font-mono badge badge-info">
+          <span
+            :if={
+              @trip_values.waiting_for_customer_at_dropoff == true and @trip_values.handed_off != true and
+                @trip_values.dropped_off != true
+            }
+            class="font-mono badge badge-info"
+          >
             <span class="animate-pulse">⌛️</span> Waiting for Customer
           </span>
           <div
-            :if={@trip_values.waiting_for_customer_timeout != nil and @trip_values.dropped_off == true}
+            :if={@trip_values.dropped_off == true}
             class="dropdown dropdown-top inline-block"
           >
             <label tabindex="0">
@@ -208,7 +213,7 @@ defmodule RsWeb.Live.Components.TripCard do
             </div>
           </div>
           <div
-            :if={@trip_values.waiting_for_customer_timeout == nil and @trip_values.dropped_off == true}
+            :if={@trip_values.handed_off == true}
             class="dropdown dropdown-top inline-block"
           >
             <label tabindex="0">
