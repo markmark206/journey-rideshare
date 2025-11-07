@@ -47,7 +47,7 @@ defmodule RS.Trip.Graph do
               {:reached_restaurant, &true?/1}
             ]
           }),
-          &is_driver_at_restaurant/1
+          &driver_at_restaurant/1
         ),
 
         # Once the driver arrived at the drop off location, waiting for the customer to come out and get the food.

@@ -151,7 +151,7 @@ defmodule RS.Trip.Logic do
     {:ok, true}
   end
 
-  def is_driver_at_restaurant(%{
+  def driver_at_restaurant(%{
         location_driver: location_driver,
         location_pickup: location_pickup,
         execution_id: execution_id
