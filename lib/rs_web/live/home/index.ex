@@ -92,28 +92,20 @@ defmodule RsWeb.Live.Home.Index do
         "🍔",
         "🍕",
         "🍟",
-        "🍱",
         "🍣",
         "🍜",
-        "🍲",
         "🌮",
-        "🍕",
-        "🌭",
         "🥗",
         "🍝",
-        "🥞",
-        "🥙",
         "🌯",
         "🧇",
         "🥪",
         "🍛",
-        "🫔",
         "🧆",
-        "🍽️",
         "🍲"
       ])
 
-    initial_driver_location = :rand.uniform(3) + 2
+    initial_driver_location = 0
     location_pickup = initial_driver_location + :rand.uniform(5) + 3
     location_dropoff = location_pickup + :rand.uniform(14) + 5
 
