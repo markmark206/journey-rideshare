@@ -67,14 +67,14 @@ defmodule RS.Trip.Graph do
 
         # Wait for the food at the restaurant.
         tick_once(
-          :done_waiting_for_food_at_restaurant_timer,
+          :waiting_for_food_at_restaurant_timer,
           unblocked_when(:waiting_for_food_at_restaurant, &true?/1),
           &in_five_minutes/1
         ),
         mutate(
-          :done_waiting_for_food_at_restaurant,
+          :waiting_for_food_at_restaurant_timeout,
           [
-            :done_waiting_for_food_at_restaurant_timer,
+            :waiting_for_food_at_restaurant_timer,
             :waiting_for_food_at_restaurant
           ],
           &record_driver_cancelled_time_after_waiting_for_food_at_restaurant/1,
@@ -198,13 +198,13 @@ defmodule RS.Trip.Graph do
 
         # Wait for the customer to come out and pickup the item for a few minutes.
         tick_once(
-          :done_waiting_for_customer_timer,
+          :waiting_for_customer_timer,
           unblocked_when(:waiting_for_customer_at_dropoff, &true?/1),
           &in_five_minutes/1
         ),
         mutate(
-          :done_waiting_for_customer,
-          [:done_waiting_for_customer_timer, :waiting_for_customer_at_dropoff],
+          :waiting_for_customer_timeout,
+          [:waiting_for_customer_timer, :waiting_for_customer_at_dropoff],
           &record_driver_asked_for_customer_to_leave/1,
           mutates: :dropped_off,
           update_revision_on_change: true
@@ -236,8 +236,8 @@ defmodule RS.Trip.Graph do
           unblocked_when({
             :or,
             [
-              {:done_waiting_for_food_at_restaurant, &provided?/1},
-              {:done_waiting_for_customer, &provided?/1},
+              {:waiting_for_food_at_restaurant_timeout, &provided?/1},
+              {:waiting_for_customer_timeout, &provided?/1},
               {:location_driver_initial, &provided?/1},
               {:driver_cancelled_time, &provided?/1},
               {:restaurant_cancelled_time, &provided?/1},

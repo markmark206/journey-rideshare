@@ -50,7 +50,7 @@ defmodule RsWeb.Live.Components.TripCard do
           <%= for i <- @trip_values.location_driver_initial..@trip_values.location_dropoff do %>
             <% marker =
               cond do
-                i == @trip_values.location_pickup and @trip_values.done_waiting_for_food_at_restaurant != nil ->
+                i == @trip_values.location_pickup and @trip_values.waiting_for_food_at_restaurant_timeout != nil ->
                   @trip_values.pickup_item
 
                 i == @trip_values.location_pickup and @trip_values.picked_up == true ->
@@ -80,11 +80,11 @@ defmodule RsWeb.Live.Components.TripCard do
                 <span class="font-mono">✅</span>
               <% i == @trip_values.location_driver and @trip_values.trip_completed_at == nil -> %>
                 <span class="font-mono animate-pulse">🚗</span>
-              <% i == @trip_values.location_pickup and @trip_values.done_waiting_for_food_at_restaurant != nil -> %>
+              <% i == @trip_values.location_pickup and @trip_values.waiting_for_food_at_restaurant_timeout != nil -> %>
                 <span class="font-mono">⌛️</span>
-              <% i == @trip_values.location_driver and @trip_values.trip_completed_at != nil and i == @trip_values.location_dropoff and @trip_values.dropped_off and @trip_values.done_waiting_for_customer == nil-> %>
+              <% i == @trip_values.location_driver and @trip_values.trip_completed_at != nil and i == @trip_values.location_dropoff and @trip_values.dropped_off and @trip_values.waiting_for_customer_timeout == nil-> %>
                 <span class="font-mono">✅</span>
-              <% i == @trip_values.location_driver and @trip_values.trip_completed_at != nil and i == @trip_values.location_dropoff and @trip_values.dropped_off and @trip_values.done_waiting_for_customer != nil-> %>
+              <% i == @trip_values.location_driver and @trip_values.trip_completed_at != nil and i == @trip_values.location_dropoff and @trip_values.dropped_off and @trip_values.waiting_for_customer_timeout != nil-> %>
                 <span class="font-mono">📦</span>
               <% i <= @trip_values.location_driver -> %>
                 <span class="font-mono">_</span>
@@ -113,7 +113,7 @@ defmodule RsWeb.Live.Components.TripCard do
             phx-value-trip={@trip}
             class="btn btn-sm btn-primary my-2 py-2"
           >
-            <span :if={@trip_values.dropped_off == true and @trip_values.done_waiting_for_customer == nil}>✅</span>
+            <span :if={@trip_values.dropped_off == true and @trip_values.waiting_for_customer_timeout == nil}>✅</span>
             Handed Off
           </.button>
         </div>
@@ -178,7 +178,7 @@ defmodule RsWeb.Live.Components.TripCard do
           </div>
 
           <div
-            :if={@trip_values.done_waiting_for_food_at_restaurant != nil and @trip_values.trip_completed_at != nil}
+            :if={@trip_values.waiting_for_food_at_restaurant_timeout != nil and @trip_values.trip_completed_at != nil}
             class="dropdown dropdown-top inline-block"
           >
             <label tabindex="0">
@@ -195,7 +195,7 @@ defmodule RsWeb.Live.Components.TripCard do
             <span class="animate-pulse">⌛️</span> Waiting for Customer
           </span>
           <div
-            :if={@trip_values.done_waiting_for_customer != nil and @trip_values.dropped_off == true}
+            :if={@trip_values.waiting_for_customer_timeout != nil and @trip_values.dropped_off == true}
             class="dropdown dropdown-top inline-block"
           >
             <label tabindex="0">
@@ -208,7 +208,7 @@ defmodule RsWeb.Live.Components.TripCard do
             </div>
           </div>
           <div
-            :if={@trip_values.done_waiting_for_customer == nil and @trip_values.dropped_off == true}
+            :if={@trip_values.waiting_for_customer_timeout == nil and @trip_values.dropped_off == true}
             class="dropdown dropdown-top inline-block"
           >
             <label tabindex="0">
