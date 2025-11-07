@@ -10,6 +10,7 @@ config :rs, RsWeb.Endpoint,
   check_origin: [
     "https://delivery-demo-6hrmbwesca-wm.a.run.app",
     "https://delivery.demo.gojourney.dev",
+    "https://jourdash.demo.gojourney.dev",
     "//localhost"
   ]
 
