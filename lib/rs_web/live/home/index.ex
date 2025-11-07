@@ -87,7 +87,7 @@ defmodule RsWeb.Live.Home.Index do
     driver_id = RS.Helpers.random_string("DRIVER", 15)
     order_id = RS.Helpers.random_string("ORDER", 15)
 
-    pickup_item =
+    item_to_deliver =
       Enum.random([
         "🍔",
         "🍕",
@@ -121,7 +121,7 @@ defmodule RsWeb.Live.Home.Index do
         location_pickup,
         location_dropoff,
         price_cents,
-        pickup_item,
+        item_to_deliver,
         socket.assigns.time_zone
       )
 

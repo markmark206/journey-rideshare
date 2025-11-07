@@ -9,7 +9,7 @@ defmodule RS.Trip do
         location_pickup,
         location_dropoff,
         price_cents,
-        pickup_item,
+        item_to_deliver,
         started_in_time_zone
       ) do
     Logger.info("""
@@ -23,7 +23,7 @@ defmodule RS.Trip do
     Dropoff Location: #{location_dropoff}
 
     Price: $#{price_cents / 100}
-    Item: #{pickup_item}
+    Item: #{item_to_deliver}
     Started in Time Zone: #{started_in_time_zone}
     """)
 
@@ -38,7 +38,7 @@ defmodule RS.Trip do
         location_pickup: location_pickup,
         location_dropoff: location_dropoff,
         price_cents: price_cents,
-        pickup_item: pickup_item,
+        item_to_deliver: item_to_deliver,
         started_in_time_zone: started_in_time_zone
       })
 

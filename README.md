@@ -107,7 +107,7 @@ iex> "TRIPX6JHTJ669Y312HADLHD1" |> Journey.load() |> Journey.values()
   location_pickup: 19,
   location_dropoff: 25,
   price_cents: 98,
-  pickup_item: "🍕",
+  item_to_deliver: "🍕",
   driver_reported_pickup_time: 1762366178,
   picked_up: true,
   dropped_off: true,
