@@ -51,16 +51,16 @@ defmodule RsWeb.Live.Components.TripCard do
             <% marker =
               cond do
                 i == @trip_values.location_pickup and @trip_values.waiting_for_food_at_restaurant_timeout != nil ->
-                  @trip_values.pickup_item
+                  @trip_values.item_to_deliver
 
                 i == @trip_values.location_pickup and @trip_values.picked_up == true ->
                   "🧑🏼‍🍳"
 
                 i == @trip_values.location_pickup and @trip_values.picked_up != true ->
-                  @trip_values.pickup_item
+                  @trip_values.item_to_deliver
 
                 i == @trip_values.location_dropoff and (@trip_values.dropped_off == true or @trip_values.handed_off == true) ->
-                  @trip_values.pickup_item
+                  @trip_values.item_to_deliver
 
                 i == @trip_values.location_dropoff and @trip_values.dropped_off != true and @trip_values.handed_off != true ->
                   "🏠"
@@ -75,7 +75,7 @@ defmodule RsWeb.Live.Components.TripCard do
           <%= for i <- @trip_values.location_driver_initial..@trip_values.location_dropoff do %>
             <%= cond do %>
               <% i == @trip_values.location_driver and @trip_values.trip_completed_at == nil and i >= @trip_values.location_pickup and @trip_values.picked_up -> %>
-                <span class="font-mono animate-pulse">{@trip_values.pickup_item}</span>
+                <span class="font-mono animate-pulse">{@trip_values.item_to_deliver}</span>
               <% i == @trip_values.location_pickup and @trip_values.picked_up -> %>
                 <span class="font-mono">✅</span>
               <% i == @trip_values.location_driver and @trip_values.trip_completed_at == nil -> %>
@@ -168,7 +168,7 @@ defmodule RsWeb.Live.Components.TripCard do
           <div :if={@trip_values.picked_up == true} class="dropdown dropdown-top inline-block">
             <label tabindex="0">
               <div class="font-mono badge badge-neutral">
-                {@trip_values.pickup_item} 🚗
+                {@trip_values.item_to_deliver} 🚗
               </div>
             </label>
             <div tabindex="0" class="dropdown-content z-[1] p-3 shadow bg-base-200 rounded-box mb-1 min-w-[200px]">
@@ -205,7 +205,7 @@ defmodule RsWeb.Live.Components.TripCard do
           >
             <label tabindex="0">
               <span class="font-mono badge badge-neutral">
-                {@trip_values.pickup_item} 🏠
+                {@trip_values.item_to_deliver} 🏠
               </span>
             </label>
             <div tabindex="0" class="dropdown-content z-[1] p-3 shadow bg-base-200 rounded-box mb-1 min-w-[200px]">
@@ -218,7 +218,7 @@ defmodule RsWeb.Live.Components.TripCard do
           >
             <label tabindex="0">
               <div class="font-mono badge badge-neutral">
-                {@trip_values.pickup_item} 🧑‍🦱
+                {@trip_values.item_to_deliver} 🧑‍🦱
               </div>
             </label>
             <div tabindex="0" class="dropdown-content z-[1] p-3 shadow bg-base-200 rounded-box mb-1 min-w-[200px]">

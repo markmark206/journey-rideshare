@@ -39,7 +39,7 @@ defmodule RS.Trip.Logic do
     last_position + 1
   end
 
-  def update_pickup_eta(%{
+  def log_driving_to_pickup(%{
         location_driver: location_driver,
         location_pickup: location_pickup,
         execution_id: execution_id
@@ -54,12 +54,12 @@ defmodule RS.Trip.Logic do
     {:ok, eta}
   end
 
-  def update_pickup_eta(%{location_pickup: location_pickup, execution_id: execution_id}) do
+  def log_driving_to_pickup(%{location_pickup: location_pickup, execution_id: execution_id}) do
     Logger.info("#{execution_id}: Waiting at pickup location #{location_pickup}.")
     {:ok, 0}
   end
 
-  def update_dropoff_eta(%{
+  def log_driving_to_dropoff(%{
         location_driver: location_driver,
         location_dropoff: location_dropoff,
         execution_id: execution_id
@@ -74,7 +74,7 @@ defmodule RS.Trip.Logic do
     {:ok, eta}
   end
 
-  def update_dropoff_eta(%{location_dropoff: location_dropoff, execution_id: execution_id}) do
+  def log_driving_to_dropoff(%{location_dropoff: location_dropoff, execution_id: execution_id}) do
     Logger.info(
       "#{execution_id}: Waiting for the customer to come pick up the item at the drop off location #{location_dropoff}."
     )
@@ -146,26 +146,12 @@ defmodule RS.Trip.Logic do
     {:ok, System.system_time(:second)}
   end
 
-  def record_driver_cancelled_time_after_waiting_for_food_at_restaurant(%{
-        execution_id: execution_id,
-        started_in_time_zone: time_zone
-      }) do
-    Logger.info(
-      "#{execution_id}: Driver cancelled the trip after waiting for pickup item to become available, at #{inspect(DateTime.now!(time_zone))}."
-    )
-
-    {:ok, System.system_time(:second)}
-  end
-
-  def record_driver_asked_for_customer_to_leave(%{execution_id: execution_id, started_in_time_zone: time_zone}) do
-    Logger.info(
-      "#{execution_id}: The customer didn't come out, the driver dropped off the item, at #{inspect(DateTime.now!(time_zone))}."
-    )
-
+  def set_driver_cancelled(%{execution_id: execution_id}) do
+    Logger.info("#{execution_id}: Driver cancelled after waiting for pickup item to become available.")
     {:ok, true}
   end
 
-  def driver_at_restaurant(%{
+  def is_driver_at_restaurant(%{
         location_driver: location_driver,
         location_pickup: location_pickup,
         execution_id: execution_id
