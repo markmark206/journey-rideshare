@@ -4,6 +4,38 @@ defmodule RsWeb.Live.Home.Index do
 
   require Logger
 
+  @delivery_items [
+    "🍔",
+    "🍕",
+    "🍟",
+    "🍣",
+    "🍜",
+    "🌮",
+    "🍓",
+    "🍒",
+    "🍇",
+    "🍎",
+    "🍊",
+    "🍋",
+    "🍌",
+    "🍐",
+    "🍑",
+    "🍆",
+    "🥑",
+    "🥦",
+    "🥬",
+    "🥕",
+    "🌿",
+    "🍅",
+    "🍉",
+    "🍝",
+    "🌯",
+    "🥪",
+    "🍛",
+    "🧆",
+    "🍲"
+  ]
+
   def mount(params, session, socket) do
     connected? = connected?(socket)
 
@@ -16,8 +48,9 @@ defmodule RsWeb.Live.Home.Index do
       end
 
     socket =
-      assign(socket, connected?: connected?)
-      |> assign(time_zone: time_zone)
+      assign(socket, :connected?, connected?)
+      |> assign(:item_to_deliver, Enum.random(@delivery_items))
+      |> assign(:time_zone, time_zone)
       |> assign(:view_analytics, false)
       |> mount_with_connected(params, session, connected?)
 
@@ -87,27 +120,9 @@ defmodule RsWeb.Live.Home.Index do
     driver_id = RS.Helpers.random_string("DRIVER", 15)
     order_id = RS.Helpers.random_string("ORDER", 15)
 
-    item_to_deliver =
-      Enum.random([
-        "🍔",
-        "🍕",
-        "🍟",
-        "🍣",
-        "🍜",
-        "🌮",
-        "🥗",
-        "🍝",
-        "🌯",
-        "🧇",
-        "🥪",
-        "🍛",
-        "🧆",
-        "🍲"
-      ])
-
     initial_driver_location = 0
-    location_pickup = initial_driver_location + :rand.uniform(5) + 3
-    location_dropoff = location_pickup + :rand.uniform(14) + 5
+    location_pickup = initial_driver_location + :rand.uniform(2) + 2
+    location_dropoff = location_pickup + :rand.uniform(10) + 4
 
     price_cents =
       (300 + (location_dropoff - location_pickup) * 100 / 3 + (location_pickup - initial_driver_location) * 100 / 2)
@@ -121,11 +136,15 @@ defmodule RsWeb.Live.Home.Index do
         location_pickup,
         location_dropoff,
         price_cents,
-        item_to_deliver,
+        socket.assigns.item_to_deliver,
         socket.assigns.time_zone
       )
 
     :ok = Phoenix.PubSub.broadcast(Rs.PubSub, "new_trips", {:trip_created, trip})
+
+    socket =
+      socket
+      |> assign(:item_to_deliver, Enum.random(@delivery_items))
 
     {:noreply, socket}
   end
@@ -197,16 +216,60 @@ defmodule RsWeb.Live.Home.Index do
             </div>
           </div>
 
+          <div id="about-service-id" class="mx-auto max-w-2xl flex justify-center px-3">
+            <div class="text-sm justify-center font-mono border-1 rounded-md mt-3 p-4 bg-base-100 w-full">
+              <div class="py-1">
+                This is a dashboard for a play-demo Food Delivery service. Deliver some snack!
+                <span class="text-lg animate-pulse">{@item_to_deliver}</span>
+              </div>
+
+              <div class="py-1">
+                The service is built in <a
+                  class="link link-primary"
+                  target="_blank"
+                  href="https://elixir-lang.org/"
+                >Elixir</a>, <a
+                  class="link link-primary"
+                  target="_blank"
+                  href="https://www.phoenixframework.org/"
+                >Phoenix LiveView</a>, with
+                <a class="link link-primary" target="_blank" href="https://hexdocs.pm/journey/">Journey</a>
+                handling persistence, scheduling, and orchestration
+                <span class="py-1">
+                  (service source code
+                  <a
+                    class="link link-primary"
+                    target="_blank"
+                    href="https://github.com/markmark206/journey-food-delivery"
+                  >
+                    repo
+                  </a>
+                  / Journey <a
+                    class="link link-primary"
+                    target="_blank"
+                    href="https://github.com/markmark206/journey-food-delivery/blob/main/lib/rs/trip/graph.ex"
+                  >graph</a>).
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <% driver_available? = @trips_in_progress < drivers_available() %>
+
           <div class="mx-auto max-w-2xl flex justify-center px-3">
             <.button
               id="start-a-new-trip-button-id"
-              disabled={@trips_in_progress >= drivers_available()}
+              disabled={not driver_available?}
               phx-click="on_start_trip_button_click"
               class="btn btn-sm btn-primary p-4 m-3 w-full"
             >
-              Start a New Trip
+              <span class="">
+                <span class={["text-lg p-2", driver_available? && "animate-pulse"]}>{@item_to_deliver}</span>
+                Start a New Delivery
+                <span class={["text-lg p-2", driver_available? && "animate-pulse"]}>{@item_to_deliver}</span>
+              </span>
               <span
-                :if={@trips_in_progress >= drivers_available()}
+                :if={not driver_available?}
                 class=""
               >
                 (no drivers available)
