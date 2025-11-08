@@ -40,162 +40,105 @@ Once the item is picked up, the driver takes it to the drop off spot -- the logs
 Once the item arrives at the drop off spot, the driver either hands off the item to the customer, or drops it off, thus completing the trip, and triggering the payment.
 
 ```elixir
-💙💛 [markmark ~/src/rideshare/rs][main][U] $ iex -S mix
+💙💛 [markmark ~/src/rideshare/rs][simpler-graph][S] $ iex -S mix
 Erlang/OTP 27 [erts-15.2.3] [source] [64-bit] [smp:10:10] [ds:10:10:10] [async-threads:1] [jit]
 
-2025-11-05 10:07:13.628 [info] Migrations already up
+Compiling 2 files (.ex)
+Generated rs app
+2025-11-08 02:23:14.904 pid=<0.296.0> [info] Migrations already up
 Interactive Elixir (1.19.1) - press Ctrl+C to exit (type h() ENTER for help)
-iex> trip = RS.Trip.new("driver1", "order1", 10, 19, 25, 98, "🍕", "America/Los_Angeles")
-2025-11-05 10:08:44.544 [info] Starting a new trip.
+iex(1)> trip = RS.Trip.new("driver1", "order1", 1, 5, 9, 98, "🍕", "America/Los_Angeles")
+2025-11-08 02:23:51.907 pid=<0.429.0> [info] Starting a new trip.
 
 Driver: driver1
-Current Driver Location: 10
+Current Driver Location: 1
 
 Order: order1
-Pickup Location: 19
-Dropoff Location: 25
+Pickup Location: 5
+Dropoff Location: 9
 
 Price: $0.98
 Item: 🍕
 Started in Time Zone: America/Los_Angeles
 
-2025-11-05 10:08:44.638 [info] TRIPX6JHTJ669Y312HADLHD1: Driving to pickup location 19. Currently at: 10. ETA: in 9.
-"TRIPX6JHTJ669Y312HADLHD1"
-2025-11-05 10:08:52.156 [info] TRIPX6JHTJ669Y312HADLHD1: Driving to pickup location 19. Currently at: 11. ETA: in 8.
-2025-11-05 10:08:57.197 [info] TRIPX6JHTJ669Y312HADLHD1: Driving to pickup location 19. Currently at: 12. ETA: in 7.
-2025-11-05 10:08:57.219 [info] TRIPX6JHTJ669Y312HADLHD1: Driving to pickup location 19. Currently at: 12. ETA: in 7.
-2025-11-05 10:09:02.292 [info] TRIPX6JHTJ669Y312HADLHD1: Driving to pickup location 19. Currently at: 13. ETA: in 6.
-2025-11-05 10:09:07.335 [info] TRIPX6JHTJ669Y312HADLHD1: Driving to pickup location 19. Currently at: 14. ETA: in 5.
-2025-11-05 10:09:07.353 [info] TRIPX6JHTJ669Y312HADLHD1: Driving to pickup location 19. Currently at: 14. ETA: in 5.
-2025-11-05 10:09:12.387 [info] TRIPX6JHTJ669Y312HADLHD1: Driving to pickup location 19. Currently at: 15. ETA: in 4.
-2025-11-05 10:09:17.412 [info] TRIPX6JHTJ669Y312HADLHD1: Driving to pickup location 19. Currently at: 16. ETA: in 3.
-2025-11-05 10:09:22.449 [info] TRIPX6JHTJ669Y312HADLHD1: Driving to pickup location 19. Currently at: 17. ETA: in 2.
-2025-11-05 10:09:27.492 [info] TRIPX6JHTJ669Y312HADLHD1: Driving to pickup location 19. Currently at: 18. ETA: in 1.
-2025-11-05 10:09:27.511 [info] TRIPX6JHTJ669Y312HADLHD1: Driving to pickup location 19. Currently at: 18. ETA: in 1.
-2025-11-05 10:09:32.542 [info] TRIPX6JHTJ669Y312HADLHD1: Driver is at pickup location 19
-2025-11-05 10:09:32.542 [info] TRIPX6JHTJ669Y312HADLHD1: Waiting at pickup location 19.
-iex> Journey.set("TRIPX6JHTJ669Y312HADLHD1", :picked_up, true); :ok
+2025-11-08 02:23:51.997 pid=<0.453.0> [info] TRIP4Y18GX0H69JDXH3122YM: Driving to pickup location 5. Currently at: 1. ETA: in 4.
+"TRIP4Y18GX0H69JDXH3122YM"
+2025-11-08 02:23:56.174 pid=<0.483.0> [info] TRIP4Y18GX0H69JDXH3122YM: Driving to pickup location 5. Currently at: 2. ETA: in 3.
+2025-11-08 02:24:01.201 pid=<0.532.0> [info] TRIP4Y18GX0H69JDXH3122YM: Driving to pickup location 5. Currently at: 3. ETA: in 2.
+2025-11-08 02:24:01.223 pid=<0.550.0> [info] TRIP4Y18GX0H69JDXH3122YM: Driving to pickup location 5. Currently at: 3. ETA: in 2.
+2025-11-08 02:24:06.236 pid=<0.572.0> [info] TRIP4Y18GX0H69JDXH3122YM: Driving to pickup location 5. Currently at: 4. ETA: in 1.
+2025-11-08 02:24:11.278 pid=<0.603.0> [info] TRIP4Y18GX0H69JDXH3122YM: Waiting at pickup location 5.
+2025-11-08 02:24:11.305 pid=<0.632.0> [info] TRIP4Y18GX0H69JDXH3122YM: Driver is at pickup location 5
+iex(2)> Journey.set("TRIP4Y18GX0H69JDXH3122YM", :picked_up, true); :ok
+2025-11-08 02:24:15.891 pid=<0.662.0> [info] TRIP4Y18GX0H69JDXH3122YM: Driving item to drop off location 9. Currently at 5. ETA: in 4.
 :ok
-2025-11-05 10:09:38.111 [info] TRIPX6JHTJ669Y312HADLHD1: Driver picked up the item, at #DateTime<2025-11-05 10:09:38.104376-08:00 PST America/Los_Angeles>.
-2025-11-05 10:09:38.120 [info] TRIPX6JHTJ669Y312HADLHD1: Driving item to drop off location 25. Currently at 19. ETA: in 6.
-2025-11-05 10:09:42.641 [info] TRIPX6JHTJ669Y312HADLHD1: Driving item to drop off location 25. Currently at 20. ETA: in 5.
-2025-11-05 10:09:47.703 [info] TRIPX6JHTJ669Y312HADLHD1: Driving item to drop off location 25. Currently at 21. ETA: in 4.
-2025-11-05 10:09:52.741 [info] TRIPX6JHTJ669Y312HADLHD1: Driving item to drop off location 25. Currently at 22. ETA: in 3.
-2025-11-05 10:09:52.757 [info] TRIPX6JHTJ669Y312HADLHD1: Driving item to drop off location 25. Currently at 22. ETA: in 3.
-2025-11-05 10:09:57.771 [info] TRIPX6JHTJ669Y312HADLHD1: Driving item to drop off location 25. Currently at 23. ETA: in 2.
-2025-11-05 10:09:57.791 [info] TRIPX6JHTJ669Y312HADLHD1: Driving item to drop off location 25. Currently at 23. ETA: in 2.
-2025-11-05 10:10:02.803 [info] TRIPX6JHTJ669Y312HADLHD1: Driving item to drop off location 25. Currently at 24. ETA: in 1.
-2025-11-05 10:10:07.872 [info] TRIPX6JHTJ669Y312HADLHD1: Waiting for the customer to come pick up the item at the drop off location 25.
-2025-11-05 10:10:07.873 [info] TRIPX6JHTJ669Y312HADLHD1: Driver is at dropoff location 25
-iex(5)> Journey.set("TRIPX6JHTJ669Y312HADLHD1", :dropped_off, true); :ok
-2025-11-05 10:10:44.430 [info] TRIPX6JHTJ669Y312HADLHD1: Driver handed the item off to the customer, at #DateTime<2025-11-05 10:10:44.430452-08:00 PST America/Los_Angeles>.
-:ok
-2025-11-05 10:10:44.445 [info] TRIPX6JHTJ669Y312HADLHD1:
-Item dropped off.
+2025-11-08 02:24:16.320 pid=<0.683.0> [info] TRIP4Y18GX0H69JDXH3122YM: Driving item to drop off location 9. Currently at 6. ETA: in 3.
+2025-11-08 02:24:21.352 pid=<0.717.0> [info] TRIP4Y18GX0H69JDXH3122YM: Driving item to drop off location 9. Currently at 7. ETA: in 2.
+2025-11-08 02:24:26.388 pid=<0.741.0> [info] TRIP4Y18GX0H69JDXH3122YM: Driving item to drop off location 9. Currently at 8. ETA: in 1.
+2025-11-08 02:24:31.424 pid=<0.775.0> [info] TRIP4Y18GX0H69JDXH3122YM: Waiting for the customer to come pick up the item at the drop off location 9.
+2025-11-08 02:24:31.450 pid=<0.797.0> [info] TRIP4Y18GX0H69JDXH3122YM: Driver is at dropoff location 9
+iex(3)> Journey.set("TRIP4Y18GX0H69JDXH3122YM", :handed_off, true); :ok
+2025-11-08 02:24:34.801 pid=<0.820.0> [info] TRIP4Y18GX0H69JDXH3122YM:
+Item handed off.
 Charging `order1` $0.98, to driver `driver1`.
 The trip is now complete.
 
-2025-11-05 10:10:44.465 [info] TRIPX6JHTJ669Y312HADLHD1: Notifying pubsub of trip completion
-iex> "TRIPX6JHTJ669Y312HADLHD1" |> Journey.load() |> Journey.values()
+:ok
+2025-11-08 02:24:34.818 pid=<0.835.0> [info] TRIP4Y18GX0H69JDXH3122YM: Notifying pubsub of trip completion
+iex(4)> Journey.load("TRIP4Y18GX0H69JDXH3122YM") |> Journey.values()
 %{
   driver_id: "driver1",
-  created_at: 1762366124,
+  created_at: 1762597431,
   started_in_time_zone: "America/Los_Angeles",
   order_id: "order1",
-  location_driver_initial: 10,
-  location_driver: 25,
-  location_pickup: 19,
-  location_dropoff: 25,
+  location_driver_initial: 1,
+  location_driver: 9,
+  location_pickup: 5,
+  location_dropoff: 9,
   price_cents: 98,
   item_to_deliver: "🍕",
-  driver_reported_pickup_time: 1762366178,
   picked_up: true,
-  dropped_off: true,
-  done_waiting_for_food_at_restaurant_timer: 1762366232,
-  driver_reported_dropoff_time: 1762366244,
-  current_location_label: "drop off point",
+  waiting_for_customer_at_dropoff: true,
   reached_dropoff_location: true,
-  trip_completed_at: 1762366244,
-  driver_location_current_timer: 1762366248,
+  waiting_for_food_at_restaurant_timer: 1762597511,
+  handed_off: true,
+  current_location_label: "drop off point",
+  execution_id: "TRIP4Y18GX0H69JDXH3122YM",
+  driver_location_current_timer: 1762597476,
+  trip_completed_at: 1762597474,
   driver_location_current_update: "updated :location_driver",
-  done_waiting_for_customer_timer: 1762366267,
+  waiting_for_customer_timer: 1762597531,
   payment: "charged $0.98. pickup `order1`, driver `driver1`",
   trip_history: [
     %{
       "metadata" => nil,
       "node" => "trip_completed_at",
-      "revision" => 310,
-      "timestamp" => 1762366244,
-      "value" => 1762366244
+      "revision" => 138,
+      "timestamp" => 1762597474,
+      "value" => 1762597474
     },
     %{
       "metadata" => nil,
       "node" => "payment",
-      "revision" => 306,
-      "timestamp" => 1762366244,
+      "revision" => 134,
+      "timestamp" => 1762597474,
       "value" => "charged $0.98. pickup `order1`, driver `driver1`"
     },
     %{
       "metadata" => nil,
-      "node" => "dropped_off",
-      "revision" => 298,
-      "timestamp" => 1762366244,
+      "node" => "handed_off",
+      "revision" => 130,
+      "timestamp" => 1762597474,
       "value" => true
     },
     %{
       "metadata" => nil,
-      "node" => "reached_dropoff_location",
-      "revision" => 270,
-      "timestamp" => 1762366207,
+      "node" => "waiting_for_customer_at_dropoff",
+      "revision" => 125,
+      "timestamp" => 1762597471,
       "value" => true
-    },
-    %{
-      "metadata" => nil,
-      "node" => "en_route",
-      "revision" => 192,
-      "timestamp" => 1762366182,
-      "value" => true
-    },
-    %{
-      "metadata" => nil,
-      "node" => "picked_up",
-      "revision" => 162,
-      "timestamp" => 1762366178,
-      "value" => true
-    },
-    %{
-      "metadata" => nil,
-      "node" => "reached_restaurant",
-      "revision" => 155,
-      "timestamp" => 1762366172,
-      "value" => true
-    },
-    %{
-      "metadata" => nil,
-      "node" => "en_route",
-      "revision" => 34,
-      "timestamp" => 1762366132,
-      "value" => true
-    },
-    %{
-      "metadata" => nil,
-      "node" => "at_starting_point",
-      "revision" => 15,
-      "timestamp" => 1762366124,
-      "value" => true
-    },
-    %{
-      "metadata" => nil,
-      "node" => "location_driver_initial",
-      "revision" => 4,
-      "timestamp" => 1762366124,
-      "value" => 10
-    }
-  ],
-  execution_id: "TRIPX6JHTJ669Y312HADLHD1",
-  last_updated_at: 1762366248
-}
-iex(7)>
+    },    
+    ...
 ```
 
 ## References
