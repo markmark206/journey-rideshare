@@ -15,6 +15,7 @@ defmodule RS.Trip.Graph do
       @graph_name,
       "v1.0",
       [
+        # Capture the creation time of the trip.
         compute(:created_at, [], &now/1),
 
         # Initial parameters of the trip.
@@ -22,7 +23,6 @@ defmodule RS.Trip.Graph do
         input(:driver_id),
         input(:order_id),
 
-        # For the purpose of this simulation, assume a 1-dimensional space, where location is a number.
         # Once the trip starts, location_driver is continuously updated by the "car's GPS."
         input(:location_driver_initial),
         input(:location_driver),
@@ -71,6 +71,8 @@ defmodule RS.Trip.Graph do
           unblocked_when(:waiting_for_food_at_restaurant, &true?/1),
           &in_a_minute/1
         ),
+
+        # If we reached the end of the wait (and no food showed up), mark the trip as cancelled by the driver.
         mutate(
           :waiting_for_food_at_restaurant_timeout,
           [
@@ -82,11 +84,11 @@ defmodule RS.Trip.Graph do
           update_revision_on_change: true
         ),
 
-        # If the driver or restaurant cancel, record the time.
-        input(:driver_cancelled),
-
-        # When the driver picks up or drops off the food, record the time.
+        # This flag indicates that the driver has picked up the item.
         input(:picked_up),
+
+        # Possible trip outcomes.
+        input(:driver_cancelled),
         input(:dropped_off),
         input(:handed_off),
 
@@ -96,28 +98,8 @@ defmodule RS.Trip.Graph do
           [:location_driver],
           &compute_location_label/1
         ),
-        compute(
-          :en_route,
-          unblocked_when({
-            :and,
-            [
-              {:location_driver, &provided?/1},
-              {:current_location_label, &en_route?/1}
-            ]
-          }),
-          fn _ -> {:ok, true} end
-        ),
-        compute(
-          :at_starting_point,
-          unblocked_when({
-            :and,
-            [
-              {:location_driver, &provided?/1},
-              {:current_location_label, &at_starting_point?/1}
-            ]
-          }),
-          fn _ -> {:ok, true} end
-        ),
+
+        # The driver has reached the restaurant.
         compute(
           :reached_restaurant,
           unblocked_when({
@@ -129,6 +111,8 @@ defmodule RS.Trip.Graph do
           }),
           fn _ -> {:ok, true} end
         ),
+
+        # The driver has reached the drop off location.
         compute(
           :reached_dropoff_location,
           unblocked_when({
@@ -140,6 +124,9 @@ defmodule RS.Trip.Graph do
           }),
           fn _ -> {:ok, true} end
         ),
+
+        # Log the driving to the pickup location.
+        # This node is here exclusively for the logging side effect.
         compute(
           :driving_to_pickup_log,
           unblocked_when({
@@ -152,6 +139,9 @@ defmodule RS.Trip.Graph do
           }),
           &log_driving_to_pickup/1
         ),
+
+        # Log the driving to the drop off location.
+        # This node is here exclusively for the logging side effect.
         compute(
           :driving_to_dropoff_log,
           unblocked_when({
@@ -159,7 +149,7 @@ defmodule RS.Trip.Graph do
             [
               {:location_driver, &provided?/1},
               {:driver_cancelled, fn x -> not true?(x) end},
-              {:picked_up, fn x -> not true?(x) end},
+              {:picked_up, &true?/1},
               {:dropped_off, fn x -> not true?(x) end},
               {:handed_off, fn x -> not true?(x) end}
             ]
@@ -168,6 +158,8 @@ defmodule RS.Trip.Graph do
         ),
 
         # Continuously polling for driver's location and updating `location_driver`.
+        # Here we are using a simulated "GPS" system that updates the driver's location every 5 seconds.
+        # TODO: move this out of the graph (into the "driver" graph)
         tick_recurring(
           :driver_location_current_timer,
           unblocked_when({
@@ -181,6 +173,7 @@ defmodule RS.Trip.Graph do
           }),
           &in_five_seconds/1
         ),
+        # Whenever the timer fires, store the updated "location" in the `location_driver` node.
         mutate(
           :driver_location_current_update,
           [:driver_location_current_timer],
@@ -189,12 +182,14 @@ defmodule RS.Trip.Graph do
           update_revision_on_change: true
         ),
 
-        # Wait for the customer to come out and pickup the item for a few minutes.
+        # Wait for the customer to come out and pickup the item.
         tick_once(
           :waiting_for_customer_timer,
           unblocked_when(:waiting_for_customer_at_dropoff, &true?/1),
           &in_a_minute/1
         ),
+
+        # If the customer didn't come out, and we reached the end of the wait, "drop off" the item at the door.
         mutate(
           :waiting_for_customer_timeout,
           unblocked_when({
@@ -210,7 +205,7 @@ defmodule RS.Trip.Graph do
           update_revision_on_change: true
         ),
 
-        # Once the drop off occurred, the payment is processed.
+        # Once the drop off or hand off occurred, the payment is processed.
         compute(
           :payment,
           unblocked_when({
@@ -228,6 +223,8 @@ defmodule RS.Trip.Graph do
           }),
           &process_payment/1
         ),
+
+        # If the trip was cancelled, or the payment was collected, the trip is all done! Record the completion time.
         compute(
           :trip_completed_at,
           unblocked_when({
@@ -238,6 +235,7 @@ defmodule RS.Trip.Graph do
             ]
           }),
           &now/1,
+          # Have pubsub notify anyone interested (e.g. liveviews that are tracking trip completions) that the trip is complete.
           f_on_save: fn trip, _params ->
             Logger.info("#{trip}: Notifying pubsub of trip completion")
             Phoenix.PubSub.broadcast(Rs.PubSub, "trip_completed", {:trip_completed, trip})
@@ -246,6 +244,7 @@ defmodule RS.Trip.Graph do
         ),
 
         # Record the history of the trip.
+        # The historian node will record any changes to its unlocked_when() nodes.
         historian(
           :trip_history,
           unblocked_when({
@@ -268,6 +267,7 @@ defmodule RS.Trip.Graph do
           })
         )
       ],
+      # Have pubsub notify anyone interested (e.g. liveviews that are watching this trip) that the trip has updated.
       f_on_save: &notify_pubsub_of_trip_update/3,
       execution_id_prefix: @graph_name
     )

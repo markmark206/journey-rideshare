@@ -131,10 +131,16 @@ defmodule RS.Trip.Logic do
     {:ok, location_label}
   end
 
-  def process_payment(%{order_id: order_id, driver_id: driver_id, price_cents: price_cents, execution_id: execution_id}) do
+  def process_payment(%{
+        handed_off: handed_off,
+        order_id: order_id,
+        driver_id: driver_id,
+        price_cents: price_cents,
+        execution_id: execution_id
+      }) do
     Logger.info("""
     #{execution_id}:
-    Item dropped off.
+    Item #{if handed_off, do: "handed off", else: "dropped off"}.
     Charging `#{order_id}` $#{price_cents / 100}, to driver `#{driver_id}`.
     The trip is now complete.
     """)
