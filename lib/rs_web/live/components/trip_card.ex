@@ -59,7 +59,7 @@ defmodule RsWeb.Live.Components.TripCard do
           >
             <span class="font-mono badge badge-neutral badge-lg">
               <span>{@trip_values.item_to_deliver}</span>
-              <span>☑️</span>
+              <span>❌</span>
               <span>{format_time_ago(@last_updated_seconds_ago)} ago</span>
             </span>
           </span>
