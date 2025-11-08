@@ -6,7 +6,7 @@ defmodule RsWeb.Live.Classes do
   end
 
   def data_point() do
-    "text-xs font-mono border-1 rounded-md p-1 m-1 font-light bg-base-100"
+    "text-xs font-mono border-1 rounded-md p-1 font-light bg-base-100"
   end
 
   def data_point_no_border() do

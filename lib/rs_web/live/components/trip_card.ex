@@ -21,7 +21,7 @@ defmodule RsWeb.Live.Components.TripCard do
     ~H"""
     <div class="m-3">
       <div
-        id={"trip-card-container-#{@trip}-id"}
+        id={"trip-card-inner-container-#{@trip}-id"}
         class={
           [section2_no_margin(), "relative"] ++
             if @trip_values.trip_completed_at != nil, do: ["text-secondary-content/40"], else: [""]
@@ -29,79 +29,99 @@ defmodule RsWeb.Live.Components.TripCard do
       >
         <h1 class="mb-2 pb-2 flex items-center">
           <span>
-            <span class={data_point()}>{@trip}</span><span class="badge badge-neutral">{@trip_values.item_to_deliver}</span>
+            <span class={data_point()}>{@trip}</span>
           </span>
-          <span :if={@trip_values.trip_completed_at == nil} class="ml-auto flex items-center gap-2">
-            <span class="font-mono badge badge-info">in progress</span>
-            <span class="font-mono status status-info status-md animate-pulse"></span>
+          <span
+            :if={@trip_values.trip_completed_at == nil}
+            id={"running-status-#{@trip}-id"}
+            class="ml-auto flex items-center gap-2"
+          >
+            <span class="font-mono badge badge-neutral p-1 badge-lg">
+              <span>{@trip_values.item_to_deliver}</span>
+              <span class="status status-success mx-1 status-lg animate-pulse"></span>
+            </span>
           </span>
           <span
             :if={@trip_values.trip_completed_at != nil and @trip_values.payment != nil}
+            id={"completed-delivered-status-#{@trip}-id"}
             class="ml-auto flex items-center gap-2"
           >
-            <span>completed</span><span class="font-mono badge badge-neutral">{format_time_ago(@last_updated_seconds_ago)}</span>
+            <span class="font-mono badge badge-neutral badge-lg">
+              <span>{@trip_values.item_to_deliver}</span>
+              <span>✅</span>
+              <span>{format_time_ago(@last_updated_seconds_ago)} ago</span>
+            </span>
           </span>
           <span
             :if={@trip_values.trip_completed_at != nil and @trip_values.payment == nil}
             class="ml-auto flex items-center gap-2"
+            id={"completed-not-delivered-status-#{@trip}-id"}
           >
-            <span>completed</span><span class="font-mono badge badge-neutral">{format_time_ago(@last_updated_seconds_ago)}</span>
+            <span class="font-mono badge badge-neutral badge-lg">
+              <span>{@trip_values.item_to_deliver}</span>
+              <span>☑️</span>
+              <span>{format_time_ago(@last_updated_seconds_ago)} ago</span>
+            </span>
           </span>
         </h1>
-        <div id="locations-destinations-id" class="text-xs font-mono">
-          <%= for i <- @trip_values.location_driver_initial..@trip_values.location_dropoff do %>
-            <% marker =
-              cond do
-                i == @trip_values.location_pickup and @trip_values.waiting_for_food_at_restaurant_timeout != nil ->
-                  @trip_values.item_to_deliver
+        <div id={"trip-journey-container-#{@trip}-id"} class="font-mono my-1 py-2">
+          <div id={"locations-destinations-#{@trip}-id"} class="text-sm font-mono">
+            <%= for i <- @trip_values.location_driver_initial..@trip_values.location_dropoff do %>
+              <% marker =
+                cond do
+                  i == @trip_values.location_pickup and @trip_values.waiting_for_food_at_restaurant_timeout != nil ->
+                    @trip_values.item_to_deliver
 
-                i == @trip_values.location_pickup and @trip_values.picked_up == true ->
-                  "🧑🏼‍🍳"
+                  i == @trip_values.location_pickup and @trip_values.picked_up == true ->
+                    "🧑🏼‍🍳"
 
-                i == @trip_values.location_pickup and @trip_values.picked_up != true ->
-                  @trip_values.item_to_deliver
+                  i == @trip_values.location_pickup and @trip_values.picked_up != true ->
+                    @trip_values.item_to_deliver
 
-                i == @trip_values.location_dropoff and (@trip_values.dropped_off == true or @trip_values.handed_off == true) ->
-                  @trip_values.item_to_deliver
+                  i == @trip_values.location_dropoff and
+                      (@trip_values.dropped_off == true or @trip_values.handed_off == true) ->
+                    @trip_values.item_to_deliver
 
-                i == @trip_values.location_dropoff and @trip_values.dropped_off != true and @trip_values.handed_off != true ->
-                  "🏠"
+                  i == @trip_values.location_dropoff and @trip_values.dropped_off != true and
+                      @trip_values.handed_off != true ->
+                    "🏠"
 
-                true ->
-                  "."
-              end %>
-            <span class="font-mono">{marker}</span>
-          <% end %>
-        </div>
-        <div id="locations-driver-id" class="text-xs font-mono">
-          <%= for i <- @trip_values.location_driver_initial..@trip_values.location_dropoff do %>
-            <%= cond do %>
-              <% i == @trip_values.location_driver and @trip_values.trip_completed_at == nil and i >= @trip_values.location_pickup and @trip_values.picked_up -> %>
-                <span class="font-mono animate-pulse">{@trip_values.item_to_deliver}</span>
-              <% i == @trip_values.location_pickup and @trip_values.picked_up -> %>
-                <span class="font-mono">✅</span>
-              <% i == @trip_values.location_driver and @trip_values.trip_completed_at == nil -> %>
-                <span class="font-mono animate-pulse">🚗</span>
-              <% i == @trip_values.location_pickup and @trip_values.waiting_for_food_at_restaurant_timeout != nil -> %>
-                <span class="font-mono">⌛️</span>
-              <% i == @trip_values.location_driver and i == @trip_values.location_dropoff and @trip_values.handed_off -> %>
-                <span class="font-mono">✅</span>
-              <% i == @trip_values.location_driver and i == @trip_values.location_dropoff and @trip_values.dropped_off -> %>
-                <span class="font-mono">📦</span>
-              <% i <= @trip_values.location_driver -> %>
-                <span class="font-mono">_</span>
-              <% true  -> %>
-                <span class="font-mono">.</span>
+                  true ->
+                    "."
+                end %>
+              <span class="font-mono">{marker}</span>
             <% end %>
-          <% end %>
+          </div>
+          <div id={"locations-driver-#{@trip}-id"} class="text-sm font-mono">
+            <%= for i <- @trip_values.location_driver_initial..@trip_values.location_dropoff do %>
+              <%= cond do %>
+                <% i == @trip_values.location_driver and @trip_values.trip_completed_at == nil and i >= @trip_values.location_pickup and @trip_values.picked_up -> %>
+                  <span class="font-mono animate-pulse">{@trip_values.item_to_deliver}</span>
+                <% i == @trip_values.location_pickup and @trip_values.picked_up -> %>
+                  <span class="font-mono">✅</span>
+                <% i == @trip_values.location_driver and @trip_values.trip_completed_at == nil -> %>
+                  <span class="font-mono animate-pulse">🚗</span>
+                <% i == @trip_values.location_pickup and @trip_values.waiting_for_food_at_restaurant_timeout != nil -> %>
+                  <span class="font-mono">⌛️</span>
+                <% i == @trip_values.location_driver and i == @trip_values.location_dropoff and @trip_values.handed_off -> %>
+                  <span class="font-mono">✅</span>
+                <% i == @trip_values.location_driver and i == @trip_values.location_dropoff and @trip_values.dropped_off -> %>
+                  <span class="font-mono">📦</span>
+                <% i <= @trip_values.location_driver -> %>
+                  <span class="font-mono">_</span>
+                <% true  -> %>
+                  <span class="font-mono">.</span>
+              <% end %>
+            <% end %>
+          </div>
         </div>
         <div class="mt-1 pt-1">
           <.button
+            id={"pickup-item-#{@trip}-button-id"}
             disabled={
               @trip_values.picked_up == true or @trip_values.waiting_for_food_at_restaurant != true or
                 @trip_values.trip_completed_at != nil
             }
-            id={"pickup-item-#{@trip}"}
             phx-click="on_pickup_item_button_click"
             phx-value-trip={@trip}
             class="btn btn-sm btn-primary my-2 py-2"
@@ -109,11 +129,11 @@ defmodule RsWeb.Live.Components.TripCard do
             <span :if={@trip_values.picked_up == true}>✅</span> Picked Up
           </.button>
           <.button
+            id={"drop-off-item-#{@trip}-button-id"}
             disabled={
               @trip_values.waiting_for_customer_timer == nil or
                 (@trip_values.handed_off == true or @trip_values.dropped_off == true)
             }
-            id={"drop-off-item-#{@trip}-id"}
             phx-click="on_handoff_item_button_click"
             phx-value-trip={@trip}
             class="btn btn-sm btn-primary my-2 py-2"
@@ -122,7 +142,7 @@ defmodule RsWeb.Live.Components.TripCard do
           </.button>
         </div>
 
-        <div :if={false} class="font-mono my-1 py-1 text-xs">
+        <div :if={false} id={"created-at-#{@trip}-id"} class="font-mono my-1 py-1 text-xs">
           <div class="">
             <span>
               {to_datetime_string!(@trip_values.created_at, @trip_values.started_in_time_zone)}
