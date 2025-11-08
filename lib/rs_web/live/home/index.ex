@@ -177,6 +177,11 @@ defmodule RsWeb.Live.Home.Index do
     {:noreply, socket}
   end
 
+  def terminate(reason, _socket) do
+    Logger.info("Terminating Live.Home (reason: #{inspect(reason)})")
+    :ok
+  end
+
   def drivers_available(), do: 5
 
   # TRIPA15Z60HXG5LH8EDM716X

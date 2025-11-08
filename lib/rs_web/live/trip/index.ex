@@ -49,17 +49,20 @@ defmodule RsWeb.Live.Trip.Index do
       :ok = Phoenix.PubSub.subscribe(Rs.PubSub, "trip:#{trip}")
     end
 
-    socket |> load_trip_to_socket_assigns(trip)
+    socket
+    |> load_trip_to_socket_assigns(trip)
+    |> start_refresh_timer_maybe()
   end
 
   def mount_with_connected(socket, _params, _session, connected?) when connected? == false do
     Logger.debug("Not connected to LiveView")
+
     socket
+    |> assign(:refresh_timer_ref, nil)
   end
 
   def handle_event("on_pickup_item_button_click", _params, socket) do
     trip = socket.assigns.trip
-
     Logger.info("#{trip}: on_pickup_item_button_click")
 
     Task.start(fn ->
@@ -91,6 +94,31 @@ defmodule RsWeb.Live.Trip.Index do
     {:noreply, load_trip_to_socket_assigns(socket, trip)}
   end
 
+  def handle_info(:refresh_last_updated, socket) do
+    Logger.debug("[#{socket.assigns.trip}]: :refresh_last_updated")
+
+    socket =
+      socket
+      |> assign(:last_updated_seconds_ago, System.system_time(:second) - socket.assigns.trip_values.last_updated_at)
+      |> start_refresh_timer_maybe()
+
+    {:noreply, socket}
+  end
+
+  def terminate(reason, socket) do
+    trip = socket.assigns[:trip]
+    timer_ref = socket.assigns.refresh_timer_ref
+
+    if timer_ref != nil do
+      Process.cancel_timer(timer_ref)
+      Logger.debug("#{trip}: Terminating LiveView (reason: #{inspect(reason)}), cancelled refresh timer")
+    else
+      Logger.debug("#{trip}: Terminating LiveView (reason: #{inspect(reason)})")
+    end
+
+    :ok
+  end
+
   def load_trip_to_socket_assigns(socket, trip) when trip == nil do
     Logger.debug("#{trip}: Loading trip to socket assigns")
 
@@ -100,18 +128,20 @@ defmodule RsWeb.Live.Trip.Index do
     |> assign(:trip, nil)
     |> assign(:trip_values, nil)
     |> assign(:last_updated_seconds_ago, 0)
+    |> assign(:refresh_timer_ref, nil)
   end
 
   def load_trip_to_socket_assigns(socket, trip) when trip != nil do
     Logger.debug("#{trip}: Loading trip to socket assigns")
     trip_values = Journey.load(trip) |> Journey.values(include_unset_as_nil: true)
+    last_updated_seconds_ago = System.system_time(:second) - trip_values.last_updated_at
 
     socket
     |> assign(:driver, trip_values.driver_id)
     |> assign(:order_id, trip_values.order_id)
     |> assign(:trip, trip)
     |> assign(:trip_values, trip_values)
-    |> assign(:last_updated_seconds_ago, System.system_time(:second) - trip_values.last_updated_at)
+    |> assign(:last_updated_seconds_ago, last_updated_seconds_ago)
   end
 
   defp to_datetime_string(unix_timestamp, time_zone) do
@@ -119,5 +149,35 @@ defmodule RsWeb.Live.Trip.Index do
     |> DateTime.from_unix!()
     |> DateTime.shift_zone!(time_zone)
     |> Calendar.strftime("%Y%m%d %H:%M:%S")
+  end
+
+  # Start the refresh timer if a trip exists (called once on mount)
+  defp start_refresh_timer_maybe(socket) do
+    seconds_since_last_updated = System.system_time(:second) - socket.assigns.trip_values.last_updated_at
+
+    timer_ref =
+      seconds_since_last_updated
+      |> calculate_refresh_interval()
+      |> case do
+        :stop ->
+          Logger.debug("[#{socket.assigns.trip}]: stopping refresh timer")
+          nil
+
+        interval_ms ->
+          Logger.debug("[#{socket.assigns.trip}]: Scheduling refresh timer for #{interval_ms}ms")
+          Process.send_after(self(), :refresh_last_updated, interval_ms)
+      end
+
+    assign(socket, :refresh_timer_ref, timer_ref)
+  end
+
+  # Calculate progressive refresh interval based on how old the trip is
+  defp calculate_refresh_interval(seconds_ago) do
+    cond do
+      seconds_ago < 60 -> :timer.seconds(5)
+      seconds_ago < 3_600 -> :timer.minutes(1)
+      seconds_ago < 86_400 -> :timer.minutes(10)
+      true -> :stop
+    end
   end
 end
