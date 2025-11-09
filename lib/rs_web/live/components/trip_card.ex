@@ -262,20 +262,79 @@ defmodule RsWeb.Live.Components.TripCard do
               <p class="text-sm">Payment was collected</p>
             </div>
           </div>
-          <.link
-            :if={@embedded}
-            navigate={"/trip/#{@trip}?show_details=true"}
+
+          <div :if={@expanded?} class={card_section()}>
+            <div class={list_element()}>Driver: <span class={data_point_no_border()}>{@trip_values.driver_id}</span></div>
+            <div class={list_element()}>
+              Started in Time Zone: <span class={data_point_no_border()}>{@trip_values.started_in_time_zone}</span>
+            </div>
+            <div class={list_element()}>
+              Order: <span class={data_point_no_border()}>{@trip_values.order_id}</span>
+            </div>
+            <div class={list_element()}>
+              Starting point: <span class={data_point_no_border()}>{@trip_values.location_driver_initial}</span>
+            </div>
+            <div class={list_element()}>
+              Pickup point: <span class={data_point_no_border()}>{@trip_values.location_pickup}</span>
+            </div>
+            <div class={list_element()}>
+              Dropoff point: <span class={data_point_no_border()}>{@trip_values.location_dropoff}</span>
+            </div>
+            <div class={list_element()}>
+              Price: <span class={data_point_no_border()}>${@trip_values.price_cents / 100}</span>
+            </div>
+          </div>
+
+          <div :if={@trip_values.trip_history != nil and @expanded?} class={card_section()}>
+            History:
+            <%= for %{"node" => node, "timestamp" => timestamp, "value" => value} <- @trip_values.trip_history |> Enum.reverse() do %>
+              <div class="text-xs my-1 font-mono">
+                <span class="text-info">{to_datetime_string_compact(timestamp, @trip_values.started_in_time_zone)}:</span> {node}
+                <span class="text-info">{value}</span>
+              </div>
+            <% end %>
+          </div>
+
+          <div
+            :if={!@embedded? and @trip_values != nil and @expanded?}
+            id={"trip-raw-trip-values-#{@trip}-id"}
+            class={card_section()}
+          >
+            Raw Trip Values:
+            <div class="text-xs my-1 font-mono">
+              <pre class="whitespace-pre-wrap break-words">{"#{inspect(@trip_values, pretty: true)}"}</pre>
+            </div>
+          </div>
+
+          <div
+            :if={@expanded?}
+            id={"trip-card-page-link-#{@trip}-id"}
+            class="absolute bottom-2 left-2 hover:opacity-70 transition-opacity p-2"
+          >
+            <.link
+              :if={@embedded?}
+              navigate={"/trip/#{@trip}"}
+              class="hover:opacity-70 transition-opacity"
+            >
+              .
+            </.link>
+
+            <.link
+              :if={!@embedded?}
+              navigate="/"
+              class="hover:opacity-70 transition-opacity"
+            >
+              .
+            </.link>
+          </div>
+          <div
+            id={"trip-card-chevron-down-#{@trip}-id"}
+            phx-click="on_trip_card_chevron_down_click"
             class="absolute bottom-2 right-2 hover:opacity-70 transition-opacity p-2"
           >
-            <.icon name="hero-arrows-pointing-out" class="w-6 h-6" />
-          </.link>
-          <.link
-            :if={!@embedded}
-            navigate="/"
-            class="absolute bottom-2 right-2 hover:opacity-70 transition-opacity p-2"
-          >
-            <.icon name="hero-arrows-pointing-in" class="w-6 h-6" />
-          </.link>
+            <.icon :if={!@expanded?} name="hero-chevron-down" class="w-6 h-6" />
+            <.icon :if={@expanded?} name="hero-chevron-up" class="w-6 h-6" />
+          </div>
         </div>
       </div>
     </div>
