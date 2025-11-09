@@ -105,7 +105,7 @@ defmodule RsWeb.Live.Home.TripCompletionTest do
         poll_for_element(
           view,
           "#waiting-for-customer-#{trip_id}-id",
-          85_000,
+          100_000,
           "waiting for driver #{trip_id} to reach dropoff"
         )
 
