@@ -25,4 +25,11 @@ defmodule RS.Helpers do
     |> DateTime.shift_zone!(time_zone)
     |> Calendar.strftime(if include_date, do: "%Y-%m-%d %H:%M:%S", else: "%H:%M:%S")
   end
+
+  def to_datetime_string_compact(unix_timestamp, time_zone) do
+    unix_timestamp
+    |> DateTime.from_unix!()
+    |> DateTime.shift_zone!(time_zone)
+    |> Calendar.strftime("%Y%m%d %H:%M:%S")
+  end
 end

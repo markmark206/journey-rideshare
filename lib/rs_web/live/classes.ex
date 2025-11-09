@@ -25,6 +25,10 @@ defmodule RsWeb.Live.Classes do
     "text-sm font-mono border-1 rounded-md m-3 p-4 bg-base-100"
   end
 
+  def card_section() do
+    "text-sm font-mono border-t-1 my-5 py-4"
+  end
+
   def section2_no_margin() do
     "text-sm font-mono border-1 rounded-md p-4 bg-base-100"
   end

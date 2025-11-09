@@ -2,7 +2,6 @@ defmodule RsWeb.Live.Trip.Index do
   @moduledoc false
   use RsWeb, :live_view
 
-  import RsWeb.Live.Classes
   require Logger
 
   def mount(params, session, socket) do
@@ -10,6 +9,7 @@ defmodule RsWeb.Live.Trip.Index do
 
     connected? = connected?(socket)
     embedded? = not is_map(params)
+    expanded? = not embedded?
 
     time_zone =
       socket
@@ -25,6 +25,7 @@ defmodule RsWeb.Live.Trip.Index do
       assign(socket, connected?: connected?)
       |> assign(show_details: show_details)
       |> assign(embedded?: embedded?)
+      |> assign(:expanded?, expanded?)
       |> assign(time_zone: time_zone)
       |> mount_with_connected(params, session, connected?)
 
@@ -59,6 +60,12 @@ defmodule RsWeb.Live.Trip.Index do
 
     socket
     |> assign(:refresh_timer_ref, nil)
+  end
+
+  def handle_event("on_trip_card_chevron_down_click", _params, socket) do
+    Logger.info("on_trip_card_chevron_down_click")
+    socket = assign(socket, :expanded?, not socket.assigns.expanded?)
+    {:noreply, socket}
   end
 
   def handle_event("on_pickup_item_button_click", _params, socket) do
@@ -142,13 +149,6 @@ defmodule RsWeb.Live.Trip.Index do
     |> assign(:trip, trip)
     |> assign(:trip_values, trip_values)
     |> assign(:last_updated_seconds_ago, last_updated_seconds_ago)
-  end
-
-  defp to_datetime_string(unix_timestamp, time_zone) do
-    unix_timestamp
-    |> DateTime.from_unix!()
-    |> DateTime.shift_zone!(time_zone)
-    |> Calendar.strftime("%Y%m%d %H:%M:%S")
   end
 
   # Start the refresh timer if a trip exists (called once on mount)
