@@ -305,7 +305,7 @@ defmodule RsWeb.Live.Home.Index do
           </div>
 
           <%= for trip <- @trips do %>
-            <div class={if trip == @newly_created_trip_id, do: "border-l-3 border-info", else: ""}>
+            <div class={if trip == @newly_created_trip_id, do: "border-l-3 border-r-3 border-info", else: ""}>
               {live_render(@socket, RsWeb.Live.Trip.Index,
                 id: "trip-lv-#{trip}",
                 session: %{"trip" => trip}
