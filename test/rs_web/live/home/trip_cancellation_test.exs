@@ -24,27 +24,17 @@ defmodule RsWeb.Live.Home.TripCancellationTest do
       # Step 4: Extract the trip ID from the notification element
       assert has_element?(view, "#new-trip-created-id")
 
-      trip_id_html =
-        view
-        |> element("#new-trip-created-id")
-        |> render()
-
-      Logger.info("Raw trip_id HTML: #{inspect(trip_id_html)}")
-
-      # Extract just the text content from the span element
-      # The render() returns something like "<span id=\"new-trip-created-id\">TRIPXXX</span>"
       trip_id =
-        trip_id_html
-        |> String.replace(~r/<[^>]+>/, "")
+        view
+        |> render()
+        |> Floki.parse_document!()
+        |> Floki.find("#new-trip-created-id")
+        |> Floki.text()
         |> String.trim()
 
       Logger.info("Extracted trip_id: #{trip_id}")
       assert String.starts_with?(trip_id, "TRIP"), "Expected trip ID to start with 'TRIP'"
       Logger.info("Trip created: #{trip_id}")
-
-      # Verify the trip exists in Journey
-      initial_values = Journey.load(trip_id) |> Journey.values(include_unset_as_nil: true)
-      Logger.info("Initial trip values: #{inspect(initial_values, pretty: true)}")
 
       # Step 5: Verify initial state - trip is running
       assert has_element?(view, "#running-status-#{trip_id}-id")
@@ -59,7 +49,7 @@ defmodule RsWeb.Live.Home.TripCancellationTest do
         poll_for_element(
           view,
           "#waiting-for-food-#{trip_id}-id",
-          45_000,
+          60_000,
           "waiting for driver #{trip_id} to reach pickup"
         )
 

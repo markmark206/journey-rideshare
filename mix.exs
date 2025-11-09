@@ -45,6 +45,7 @@ defmodule Rs.MixProject do
       {:dns_cluster, "~> 0.2.0"},
       {:ecto_sql, "~> 3.13"},
       {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
+      {:floki, "~> 0.38.0"},
       {:gettext, "~> 0.26"},
       {:heroicons,
        github: "tailwindlabs/heroicons", tag: "v2.2.0", sparse: "optimized", app: false, compile: false, depth: 1},

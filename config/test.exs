@@ -18,7 +18,6 @@ config :journey, Journey.Repo,
   password: "postgres",
   hostname: "localhost",
   database: "rs_journey_test#{System.get_env("MIX_TEST_PARTITION")}",
-  pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2
 
 # We don't run a server during test. If one is required,

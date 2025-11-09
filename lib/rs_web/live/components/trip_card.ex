@@ -219,12 +219,14 @@ defmodule RsWeb.Live.Components.TripCard do
               @trip_values.waiting_for_customer_at_dropoff == true and @trip_values.handed_off != true and
                 @trip_values.dropped_off != true
             }
+            id={"waiting-for-customer-#{@trip}-id"}
             class="font-mono badge badge-info"
           >
             <span class="animate-pulse">⌛️</span> Waiting for Customer
           </span>
           <div
             :if={@trip_values.dropped_off == true}
+            id={"dropped-off-#{@trip}-id"}
             class="dropdown dropdown-top inline-block"
           >
             <label tabindex="0">
@@ -238,6 +240,7 @@ defmodule RsWeb.Live.Components.TripCard do
           </div>
           <div
             :if={@trip_values.handed_off == true}
+            id={"handed-off-#{@trip}-id"}
             class="dropdown dropdown-top inline-block"
           >
             <label tabindex="0">
@@ -249,7 +252,7 @@ defmodule RsWeb.Live.Components.TripCard do
               <p class="text-sm">Handed the food off to the customer</p>
             </div>
           </div>
-          <div :if={@trip_values.payment != nil} class="dropdown dropdown-top inline-block">
+          <div :if={@trip_values.payment != nil} id={"payment-#{@trip}-id"} class="dropdown dropdown-top inline-block">
             <label tabindex="0">
               <div class="font-mono badge badge-success">
                 ${@trip_values.price_cents / 100}
