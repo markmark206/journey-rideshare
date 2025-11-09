@@ -23,7 +23,6 @@ config :swoosh, local: false
 # Do not print debug messages in production
 config :logger, level: :info
 
-# Journey settings
 config :journey, log_level: :warning
 config :journey, :background_sweeper, period_seconds: 5
 

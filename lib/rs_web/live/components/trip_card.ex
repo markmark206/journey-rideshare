@@ -183,6 +183,7 @@ defmodule RsWeb.Live.Components.TripCard do
           </div>
           <div
             :if={@trip_values.waiting_for_food_at_restaurant == true and @trip_values.trip_completed_at == nil}
+            id={"waiting-for-food-#{@trip}-id"}
             class="font-mono badge badge-info"
           >
             <span class="animate-pulse">⌛️</span> Waiting for Food
@@ -200,6 +201,7 @@ defmodule RsWeb.Live.Components.TripCard do
 
           <div
             :if={@trip_values.waiting_for_food_at_restaurant_timeout != nil and @trip_values.trip_completed_at != nil}
+            id={"no-food-timeout-#{@trip}-id"}
             class="dropdown dropdown-top inline-block"
           >
             <label tabindex="0">
