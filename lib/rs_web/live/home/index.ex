@@ -98,7 +98,7 @@ defmodule RsWeb.Live.Home.Index do
 
     socket
     |> load_trips()
-    |> assign(:new_trip_created, nil)
+    |> assign(:newly_created_trip_id, nil)
   end
 
   def mount_with_connected(socket, _params, _session, connected?) when connected? == false do
@@ -107,7 +107,7 @@ defmodule RsWeb.Live.Home.Index do
     socket
     |> assign(trips: [])
     |> assign(:analytics, "")
-    |> assign(:new_trip_created, nil)
+    |> assign(:newly_created_trip_id, nil)
   end
 
   def handle_event("on-toggle-view-analytics-click" = event, _params, socket) do
@@ -151,7 +151,7 @@ defmodule RsWeb.Live.Home.Index do
     socket =
       socket
       |> assign(:item_to_deliver, Enum.random(@delivery_items))
-      |> assign(:new_trip_created, trip)
+      |> assign(:newly_created_trip_id, trip)
 
     {:noreply, socket}
   end
@@ -191,8 +191,6 @@ defmodule RsWeb.Live.Home.Index do
 
   def drivers_available(), do: 5
 
-  # TRIPA15Z60HXG5LH8EDM716X
-  # http://localhost:4000/trip/TRIPA15Z60HXG5LH8EDM716X
   def render(assigns) do
     ~H"""
     <div>
@@ -231,37 +229,45 @@ defmodule RsWeb.Live.Home.Index do
           <div id="about-service-id" class="mx-auto max-w-2xl flex justify-center px-3">
             <div class="text-sm justify-center font-mono border-1 rounded-md mt-3 p-4 bg-base-100 w-full">
               <div class="py-1">
-                This is a dashboard for the play-demo JourDash Delivery service. Let's deliver some snacks!
-                <span class="text-lg animate-pulse">{@item_to_deliver}</span>
+                This is a dashboard for the play-demo JourDash Delivery service.
               </div>
-
               <div class="py-1">
-                The service is built in <a
+                The service is built with
+                <a
                   class="link link-primary"
                   target="_blank"
                   href="https://elixir-lang.org/"
-                >Elixir</a>, <a
+                >
+                  Elixir
+                </a>
+                and <a
                   class="link link-primary"
                   target="_blank"
                   href="https://www.phoenixframework.org/"
                 >Phoenix LiveView</a>, with
                 <a class="link link-primary" target="_blank" href="https://hexdocs.pm/journey/">Journey</a>
-                handling persistence, scheduling, and orchestration
-                <span class="py-1">
-                  (service source code
-                  <a
-                    class="link link-primary"
-                    target="_blank"
-                    href="https://github.com/markmark206/journey-food-delivery"
-                  >
-                    repo
-                  </a>
-                  / Journey <a
-                    class="link link-primary"
-                    target="_blank"
-                    href="https://github.com/markmark206/journey-food-delivery/blob/main/lib/rs/trip/graph.ex"
-                  >graph</a>).
-                </span>
+                providing persistence, scheduling, crash recovery, and orchestration.
+              </div>
+              <div class="py-1">
+                JourDash source is available on Github:
+                <a
+                  class="link link-primary"
+                  target="_blank"
+                  href="https://github.com/markmark206/journey-food-delivery"
+                >
+                  repo
+                </a>
+                |
+                <a
+                  class="link link-primary"
+                  target="_blank"
+                  href="https://github.com/markmark206/journey-food-delivery/blob/main/lib/rs/trip/graph.ex"
+                >
+                  graph
+                </a>
+              </div>
+              <div class="py-1">
+                Let's deliver some snacks! <span class="text-lg animate-pulse">{@item_to_deliver}</span>
               </div>
             </div>
           </div>
@@ -289,17 +295,19 @@ defmodule RsWeb.Live.Home.Index do
             </.button>
           </div>
 
-          <div :if={@new_trip_created != nil} class="mx-auto max-w-2xl px-3">
+          <div :if={@newly_created_trip_id != nil} class="hidden mx-auto max-w-2xl px-3">
             <div class="text-sm font-mono border-1 rounded-md p-3 bg-base-100">
-              New Trip Created: <span id="new-trip-created-id">{@new_trip_created}</span>
+              New Trip Created: <span id="new-trip-created-id">{@newly_created_trip_id}</span>
             </div>
           </div>
 
           <%= for trip <- @trips do %>
-            {live_render(@socket, RsWeb.Live.Trip.Index,
-              id: "trip-lv-#{trip}",
-              session: %{"trip" => trip}
-            )}
+            <div class={if trip == @newly_created_trip_id, do: "border-l-3 border-info", else: ""}>
+              {live_render(@socket, RsWeb.Live.Trip.Index,
+                id: "trip-lv-#{trip}",
+                session: %{"trip" => trip}
+              )}
+            </div>
           <% end %>
         </div>
       </div>
