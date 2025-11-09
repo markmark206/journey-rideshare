@@ -23,21 +23,23 @@ You can now navigate to http://localhost:4000 and start a few deliveries, usher 
 
 The definition of the workflow can be found in [lib/rs/trip/graph.ex](./lib/rs/trip/graph.ex), and the example below illustrates running an execution of this workflow, which gets created once the driver and the order get matched.
 
-The workflow is built with [Journey](https://hexdocs.pm/journey), an Elixir package for defining and executing Persisted Distributed Reactive Graphs, so I didn't need to write much code for
+The workflow is built with [Journey](https://hexdocs.pm/journey), an Elixir package for defining and executing Persisted Distributed Reactive Graphs. In this application, Journey provided:
 * persistence (db schemas),
 * scheduling one-time and recurring tasks,
 * orchestrating conditional events and dependencies,
 * structuring the code of orchestration logic and computations,
 * retries and crash recovery,
-* distribution and horizontal scalability,
+* distributed computations and horizontal scalability.
 
-while keeping the application concise, self-documented (see the graph), and naturally scalable – resilient, durable executions in a package. Journey's [f_on_save](https://hexdocs.pm/journey/search.html?q=f_on_save) functions generate PubSub notifications which trigger UI updates.
+... which is hundreds of lines of code and a lot of non-trivial complexity that I didn't have to write. Instead, the core of the application is concise (most of the code is in the UI!), resilient, self-documented (see the [graph](./lib/rs/trip/graph.ex)), and naturally scalable. Journey's [f_on_save](https://hexdocs.pm/journey/search.html?q=f_on_save) functions generate PubSub notifications which trigger UI updates.
 
-The log shows the trip starting and the driver driving to pickup location.
 
-Once the item is picked up, the driver takes it to the drop off spot -- the logs show the tracking of simulated GPS data.
+## `iex`: Sample Trip
 
-Once the item arrives at the drop off spot, the driver either hands off the item to the customer, or drops it off, thus completing the trip, and triggering the payment.
+This `iex` session illustrates creating a new trip, and ushering it through – with logs and function calls.
+
+Once the trip starts, the driver drives to the pickup location. If the food shows up within allotted time (if the driver marks `picked_up` as `true`), the driver proceeds to the drop off location. If the customer comes out to pick up the food, the driver sets `handed_off`, otherwise, the item is `dropped_off`. At that point, the payment gets collected. That's all!
+
 
 ```elixir
 💙💛 [markmark ~/src/rideshare/rs][simpler-graph][S] $ iex -S mix
