@@ -126,22 +126,6 @@ defmodule RsWeb.Live.Trip.Index do
     :ok
   end
 
-  def render(assigns) do
-    ~H"""
-    <div class={if @embedded?, do: "space-y-6", else: "mx-auto max-w-2xl space-y-6"}>
-      <div :if={@connected?} class="space-y-4">
-        <RsWeb.Live.Components.TripCard.render
-          trip_values={@trip_values}
-          trip={@trip}
-          embedded?={@embedded?}
-          expanded?={@expanded?}
-          last_updated_seconds_ago={@last_updated_seconds_ago}
-        />
-      </div>
-    </div>
-    """
-  end
-
   def load_trip_to_socket_assigns(socket, trip) when trip == nil do
     Logger.debug("#{trip}: Loading trip to socket assigns")
 
@@ -195,5 +179,21 @@ defmodule RsWeb.Live.Trip.Index do
       seconds_ago < 86_400 -> :timer.minutes(10)
       true -> :stop
     end
+  end
+
+  def render(assigns) do
+    ~H"""
+    <div class={if @embedded?, do: "space-y-6", else: "mx-auto max-w-2xl space-y-6"}>
+      <div :if={@connected?} class="space-y-4">
+        <RsWeb.Live.Components.TripCard.render
+          trip_values={@trip_values}
+          trip={@trip}
+          embedded?={@embedded?}
+          expanded?={@expanded?}
+          last_updated_seconds_ago={@last_updated_seconds_ago}
+        />
+      </div>
+    </div>
+    """
   end
 end
