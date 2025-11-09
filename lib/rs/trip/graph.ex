@@ -159,7 +159,7 @@ defmodule RS.Trip.Graph do
 
         # Continuously polling for driver's location and updating `location_driver`.
         # Here we are using a simulated "GPS" system that updates the driver's location every 5 seconds.
-        # TODO: move this out of the graph (into the "driver" graph)
+        # TODO: move this out of the graph (into the "driver" graph) - have the driver's "GPS" provide the data.
         tick_recurring(
           :driver_location_current_timer,
           unblocked_when({
