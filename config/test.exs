@@ -18,7 +18,6 @@ config :journey, Journey.Repo,
   password: "postgres",
   hostname: "localhost",
   database: "rs_journey_test#{System.get_env("MIX_TEST_PARTITION")}",
-  pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: System.schedulers_online() * 2
 
 # We don't run a server during test. If one is required,
@@ -36,6 +35,9 @@ config :swoosh, :api_client, false
 
 # Print only warnings and errors during test
 config :logger, level: :warning
+
+config :journey, log_level: :warning
+config :journey, :background_sweeper, period_seconds: 5
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime

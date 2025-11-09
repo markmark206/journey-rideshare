@@ -62,6 +62,7 @@ config :phoenix, :json_library, Jason
 
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
+# Journey settings
 config :journey, :graphs, [
   &RS.Trip.Graph.graph/0
 ]

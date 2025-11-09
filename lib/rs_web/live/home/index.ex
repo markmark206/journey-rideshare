@@ -96,12 +96,18 @@ defmodule RsWeb.Live.Home.Index do
     :ok = Phoenix.PubSub.subscribe(Rs.PubSub, "new_trips")
     :ok = Phoenix.PubSub.subscribe(Rs.PubSub, "trip_completed")
 
-    load_trips(socket)
+    socket
+    |> load_trips()
+    |> assign(:new_trip_created, nil)
   end
 
   def mount_with_connected(socket, _params, _session, connected?) when connected? == false do
     Logger.debug("Not connected to LiveView")
-    socket |> assign(trips: []) |> assign(:analytics, "")
+
+    socket
+    |> assign(trips: [])
+    |> assign(:analytics, "")
+    |> assign(:new_trip_created, nil)
   end
 
   def handle_event("on-toggle-view-analytics-click" = event, _params, socket) do
@@ -145,6 +151,7 @@ defmodule RsWeb.Live.Home.Index do
     socket =
       socket
       |> assign(:item_to_deliver, Enum.random(@delivery_items))
+      |> assign(:new_trip_created, trip)
 
     {:noreply, socket}
   end
@@ -280,6 +287,12 @@ defmodule RsWeb.Live.Home.Index do
                 (no drivers available)
               </span>
             </.button>
+          </div>
+
+          <div :if={@new_trip_created != nil} class="mx-auto max-w-2xl px-3">
+            <div class="text-sm font-mono border-1 rounded-md p-3 bg-base-100">
+              New Trip Created: <span id="new-trip-created-id">{@new_trip_created}</span>
+            </div>
           </div>
 
           <%= for trip <- @trips do %>

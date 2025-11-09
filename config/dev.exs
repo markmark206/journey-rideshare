@@ -82,16 +82,15 @@ config :logger, :default_formatter,
   format: "$date $time $metadata[$level] $message\n",
   metadata: [:pid, :request_id]
 
+config :journey, log_level: :warning
+config :journey, :background_sweeper, period_seconds: 5
+
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
 config :phoenix, :stacktrace_depth, 20
 
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
-
-config :journey, log_level: :warning
-# config :journey, log_level: :info
-config :journey, :background_sweeper, period_seconds: 5
 
 config :phoenix_live_view,
   # Include debug annotations and locations in rendered markup.
