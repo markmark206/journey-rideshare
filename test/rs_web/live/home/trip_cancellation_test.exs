@@ -15,7 +15,7 @@ defmodule RsWeb.Live.Home.TripCancellationTest do
 
       # Step 2: Verify start trip button exists and is enabled
       assert has_element?(view, "#start-a-new-trip-button-id")
-      assert html =~ "Trips in progress"
+      assert html =~ "Deliveries:"
 
       # Step 3: Click the start trip button to create a new trip
       Logger.info("Clicking start trip button")
