@@ -4,6 +4,6 @@ defmodule RsWeb.PageControllerTest do
 
   test "LIVE GET /", %{conn: conn} do
     {:ok, _view, html} = live(conn, ~p"/")
-    assert html =~ "Trips in progress"
+    assert html =~ "Deliveries"
   end
 end

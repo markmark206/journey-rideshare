@@ -44,4 +44,16 @@ defmodule RsWeb.Live.Classes do
   def badge(active?) when active? == false do
     " badge badge-neutral "
   end
+
+  def no_show() do
+    "⏳"
+  end
+
+  def dropped_off() do
+    "🏠"
+  end
+
+  def handed_off() do
+    "🧑‍🦱"
+  end
 end

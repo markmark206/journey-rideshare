@@ -63,10 +63,18 @@ defmodule RsWeb.Live.Home.Index do
   defp load_trips(socket) do
     Logger.debug("Loading trips")
 
-    all_trips =
-      Journey.list_executions(graph_name: "trip", sort_by: [created_at: :desc], limit: 100)
+    trip_count_completed = Journey.count_executions(graph_name: "trip", filter_by: [{:trip_completed_at, :is_set}])
+    trip_count_paid = Journey.count_executions(graph_name: "trip", filter_by: [{:payment, :is_set}])
 
-    trips_in_progress =
+    trip_count_food_no_show =
+      Journey.count_executions(graph_name: "trip", filter_by: [{:driver_cancelled, :eq, true}])
+
+    trip_count_dropped_off = Journey.count_executions(graph_name: "trip", filter_by: [{:dropped_off, :eq, true}])
+    trip_count_handed_off = Journey.count_executions(graph_name: "trip", filter_by: [{:handed_off, :eq, true}])
+
+    all_trips = Journey.list_executions(graph_name: "trip", sort_by: [created_at: :desc], limit: 100)
+
+    trip_count_in_progress =
       all_trips
       |> Enum.count(fn execution ->
         execution
@@ -89,8 +97,13 @@ defmodule RsWeb.Live.Home.Index do
       |> Journey.Insights.FlowAnalytics.to_text()
 
     socket
+    |> assign(trip_count_completed: trip_count_completed)
+    |> assign(trip_count_paid: trip_count_paid)
+    |> assign(trip_count_food_no_show: trip_count_food_no_show)
+    |> assign(trip_count_dropped_off: trip_count_dropped_off)
+    |> assign(trip_count_handed_off: trip_count_handed_off)
     |> assign(trips: trips)
-    |> assign(trips_in_progress: trips_in_progress)
+    |> assign(trip_count_in_progress: trip_count_in_progress)
     |> assign(:analytics, analytics_text)
   end
 
@@ -161,13 +174,13 @@ defmodule RsWeb.Live.Home.Index do
 
   def handle_info({:trip_created, trip}, socket) do
     Logger.debug("#{trip}: Handling trip creation")
-    total_trips = socket.assigns.trips_in_progress + 1
+    trip_count_in_progress = socket.assigns.trip_count_in_progress + 1
 
     trips = if socket.assigns.trips |> Enum.member?(trip), do: socket.assigns.trips, else: [trip | socket.assigns.trips]
 
     socket =
       socket
-      |> assign(trips_in_progress: total_trips)
+      |> assign(trip_count_in_progress: trip_count_in_progress)
       |> assign(trips: trips)
 
     {:noreply, socket}
@@ -175,14 +188,53 @@ defmodule RsWeb.Live.Home.Index do
 
   def handle_info({:trip_completed, trip}, socket) do
     Logger.debug("#{trip}: Handling trip completion")
-    total_trips = socket.assigns.trips_in_progress - 1
 
-    trips = if trip in socket.assigns.trips, do: socket.assigns.trips, else: [trip | socket.assigns.trips]
+    # Update stats -- trips in progress, etc.
+    trip_count_in_progress = socket.assigns.trip_count_in_progress - 1
+    trip_count_completed = socket.assigns.trip_count_completed + 1
+    trip_values = Journey.load(trip) |> Journey.values(include_unset_as_nil: true)
+
+    trip_count_food_no_show =
+      if trip_values.driver_cancelled do
+        socket.assigns.trip_count_food_no_show + 1
+      else
+        socket.assigns.trip_count_food_no_show
+      end
+
+    trip_count_dropped_off =
+      if trip_values.dropped_off do
+        socket.assigns.trip_count_dropped_off + 1
+      else
+        socket.assigns.trip_count_dropped_off
+      end
+
+    trip_count_handed_off =
+      if trip_values.handed_off do
+        socket.assigns.trip_count_handed_off + 1
+      else
+        socket.assigns.trip_count_handed_off
+      end
+
+    trip_count_paid =
+      if trip_values.payment do
+        socket.assigns.trip_count_paid + 1
+      else
+        socket.assigns.trip_count_paid
+      end
 
     socket =
-      socket
-      |> assign(trips_in_progress: total_trips)
-      |> assign(trips: trips)
+      if trip in socket.assigns.trips do
+        socket
+      else
+        socket
+        |> assign(trips: [trip | socket.assigns.trips])
+      end
+      |> assign(trip_count_in_progress: trip_count_in_progress)
+      |> assign(trip_count_completed: trip_count_completed)
+      |> assign(trip_count_food_no_show: trip_count_food_no_show)
+      |> assign(trip_count_dropped_off: trip_count_dropped_off)
+      |> assign(trip_count_handed_off: trip_count_handed_off)
+      |> assign(trip_count_paid: trip_count_paid)
 
     {:noreply, socket}
   end
@@ -199,83 +251,19 @@ defmodule RsWeb.Live.Home.Index do
     <div>
       <div class="mx-auto max-w-2xl space-y-6">
         <div :if={@connected?} class="space-y-4">
-          <div class="mx-auto max-w-2xl flex justify-center px-3">
-            <div class="text-sm font-mono border-1 rounded-md mt-3 p-4 bg-base-100 w-full">
-              Trips in progress: <span class="font-mono badge badge-neutral">{@trips_in_progress}</span>
-              <div class="pt-2">
-                <div
-                  id="form-show-analytics-id"
-                  phx-click="on-toggle-view-analytics-click"
-                  class="hover:bg-info p-2 rounded-md"
-                >
-                  <.icon
-                    :if={not @view_analytics}
-                    name="hero-chevron-down"
-                    class="w-4 h-4 p-1 "
-                  />
-                  <.icon
-                    :if={@view_analytics}
-                    name="hero-chevron-up"
-                    class="w-4 h-4 p-1"
-                  /> View Analytics
-                </div>
-              </div>
+          <RsWeb.Live.Components.Analytics.render
+            trip_count_in_progress={@trip_count_in_progress}
+            trip_count_completed={@trip_count_completed}
+            trip_count_paid={@trip_count_paid}
+            trip_count_food_no_show={@trip_count_food_no_show}
+            trip_count_dropped_off={@trip_count_dropped_off}
+            trip_count_handed_off={@trip_count_handed_off}
+            view_analytics={@view_analytics}
+            analytics={@analytics}
+          />
+          <RsWeb.Live.Components.About.render item_to_deliver={@item_to_deliver} />
 
-              <pre
-                :if={@view_analytics}
-                id="analytics-id"
-                class="border-1 p-3 bg-neutral rounded-md my-2 whitespace-pre-wrap break-words"
-              >{@analytics}</pre>
-            </div>
-          </div>
-
-          <div id="about-service-id" class="mx-auto max-w-2xl flex justify-center px-3">
-            <div class="text-sm justify-center font-mono border-1 rounded-md mt-3 p-4 bg-base-100 w-full">
-              <div class="py-1">
-                This is a dashboard for the play-demo JourDash Delivery service.
-              </div>
-              <div class="py-1">
-                The service is built with
-                <a
-                  class="link link-primary"
-                  target="_blank"
-                  href="https://elixir-lang.org/"
-                >
-                  Elixir
-                </a>
-                and <a
-                  class="link link-primary"
-                  target="_blank"
-                  href="https://www.phoenixframework.org/"
-                >Phoenix LiveView</a>, with
-                <a class="link link-primary" target="_blank" href="https://hexdocs.pm/journey/">Journey</a>
-                providing persistence, scheduling, crash recovery, and orchestration.
-              </div>
-              <div class="py-1">
-                JourDash source is available on Github:
-                <a
-                  class="link link-primary"
-                  target="_blank"
-                  href="https://github.com/markmark206/journey-food-delivery"
-                >
-                  repo
-                </a>
-                |
-                <a
-                  class="link link-primary"
-                  target="_blank"
-                  href="https://github.com/markmark206/journey-food-delivery/blob/main/lib/rs/trip/graph.ex"
-                >
-                  graph
-                </a>
-              </div>
-              <div class="py-1">
-                Let's deliver some snacks! <span class="text-lg animate-pulse">{@item_to_deliver}</span>
-              </div>
-            </div>
-          </div>
-
-          <% driver_available? = @trips_in_progress < drivers_available() %>
+          <% driver_available? = @trip_count_in_progress < drivers_available() %>
 
           <div class="mx-auto max-w-2xl flex justify-center px-3">
             <.button
