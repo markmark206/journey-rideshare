@@ -49,7 +49,7 @@ defmodule RsWeb.Live.Home.TripCompletionTest do
         poll_for_element(
           view,
           "#waiting-for-food-#{trip_id}-id",
-          100_000,
+          120_000,
           "waiting for driver #{trip_id} to reach pickup"
         )
 

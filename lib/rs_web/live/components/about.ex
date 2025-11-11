@@ -24,8 +24,8 @@ defmodule RsWeb.Live.Components.About do
             target="_blank"
             href="https://www.phoenixframework.org/"
           >Phoenix LiveView</a>, with
-          <a class="link link-primary" target="_blank" href="https://hexdocs.pm/journey/">Journey</a>
-          providing persistence, scheduling, crash recovery, and orchestration.
+          <a class="link link-primary" target="_blank" href="https://hexdocs.pm/journey/">hexdocs.pm/journey</a>
+          providing durable executions, with persistence, scheduling, crash recovery, and orchestration.
         </div>
         <div class="py-1">
           JourDash source is available on Github:
