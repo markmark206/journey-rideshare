@@ -67,50 +67,41 @@ defmodule RsWeb.Live.Components.TripCard do
         <div id={"trip-journey-container-#{@trip}-id"} class="font-mono my-1 py-2">
           <div id={"locations-destinations-#{@trip}-id"} class="text-sm font-mono">
             <%= for i <- @trip_values.location_driver_initial..@trip_values.location_dropoff do %>
-              <% marker =
-                cond do
-                  i == @trip_values.location_pickup and @trip_values.waiting_for_food_at_restaurant_timeout != nil ->
-                    @trip_values.item_to_deliver
-
-                  i == @trip_values.location_pickup and @trip_values.picked_up == true ->
-                    "🧑🏼‍🍳"
-
-                  i == @trip_values.location_pickup and @trip_values.picked_up != true ->
-                    @trip_values.item_to_deliver
-
-                  i == @trip_values.location_dropoff and
-                      (@trip_values.dropped_off == true or @trip_values.handed_off == true) ->
-                    @trip_values.item_to_deliver
-
-                  i == @trip_values.location_dropoff and @trip_values.dropped_off != true and
-                      @trip_values.handed_off != true ->
-                    "🏠"
-
-                  true ->
-                    "."
-                end %>
-              <span class="font-mono">{marker}</span>
+              <%= cond do %>
+                <% i == @trip_values.location_pickup and @trip_values.waiting_for_food_at_restaurant_timeout != nil -> %>
+                  <span class="font-mono text-lg">{@trip_values.item_to_deliver}</span>
+                <% i == @trip_values.location_pickup and @trip_values.picked_up == true -> %>
+                  <span class="font-mono text-lg">🧑🏼‍🍳</span>
+                <% i == @trip_values.location_pickup and @trip_values.picked_up != true -> %>
+                  <span class="font-mono text-lg">{@trip_values.item_to_deliver}</span>
+                <% i == @trip_values.location_dropoff and (@trip_values.dropped_off == true or @trip_values.handed_off == true) -> %>
+                  <span class="font-mono text-lg">{@trip_values.item_to_deliver}</span>
+                <% i == @trip_values.location_dropoff and @trip_values.dropped_off != true and @trip_values.handed_off != true -> %>
+                  <span class="font-mono text-lg">🏠</span>
+                <% true -> %>
+                  <span class="font-mono">&nbsp;</span>
+              <% end %>
             <% end %>
           </div>
-          <div id={"locations-driver-#{@trip}-id"} class="text-sm font-mono">
+          <div id={"locations-driver-#{@trip}-id"} class="text-sm font-mono ">
             <%= for i <- @trip_values.location_driver_initial..@trip_values.location_dropoff do %>
               <%= cond do %>
                 <% i == @trip_values.location_driver and @trip_values.trip_completed_at == nil and i >= @trip_values.location_pickup and @trip_values.picked_up -> %>
-                  <span class="font-mono animate-pulse">{@trip_values.item_to_deliver}</span>
+                  <span class="font-mono animate-pulse text-lg">{@trip_values.item_to_deliver}</span>
                 <% i == @trip_values.location_pickup and @trip_values.picked_up -> %>
-                  <span class="font-mono">✅</span>
+                  <span class="font-mono text-lg">✅</span>
                 <% i == @trip_values.location_driver and @trip_values.trip_completed_at == nil -> %>
-                  <span class="font-mono animate-pulse">🚗</span>
+                  <span class="font-mono text-lg animate-pulse inline-block -scale-x-100">🚗</span>
                 <% i == @trip_values.location_pickup and @trip_values.waiting_for_food_at_restaurant_timeout != nil -> %>
-                  <span class="font-mono">⌛️</span>
+                  <span class="font-mono text-lg">⌛️</span>
                 <% i == @trip_values.location_driver and i == @trip_values.location_dropoff and @trip_values.handed_off -> %>
-                  <span class="font-mono">✅</span>
+                  <span class="font-mono text-lg">✅</span>
                 <% i == @trip_values.location_driver and i == @trip_values.location_dropoff and @trip_values.dropped_off -> %>
-                  <span class="font-mono">📦</span>
+                  <span class="font-mono text-lg">📦</span>
                 <% i <= @trip_values.location_driver -> %>
-                  <span class="font-mono">_</span>
+                  <span class="font-mono text-success">●</span>
                 <% true  -> %>
-                  <span class="font-mono">.</span>
+                  <span class="font-mono">○</span>
               <% end %>
             <% end %>
           </div>

@@ -16,24 +16,31 @@ defmodule RsWeb.Live.Components.Analytics do
             <div class="ml-2">
               <span :if={@trip_count_in_progress > 0} class="status status-success animate-pulse"></span>
               <span :if={@trip_count_in_progress <= 0} class="">●</span>
-              in progress: <span class="font-mono badge badge-neutral">{@trip_count_in_progress}</span>
+              in progress: <span class="font-mono badge badge-info">{@trip_count_in_progress}</span>
             </div>
             <div class="ml-2">
-              ● completed: <span class="font-mono badge badge-neutral">{@trip_count_completed}</span>
+              ● completed: <span class="font-mono badge badge-info">{@trip_count_completed}</span>
             </div>
             <div class="ml-2">
               <div class="ml-2">
-                + <span class="font-mono badge badge-neutral">{@trip_count_food_no_show}</span> ({no_show()} food no show)
+                + <span class="font-mono badge badge-info">{@trip_count_food_no_show}</span>
+                (<span class="font-mono badge badge-info">{percentage(@trip_count_food_no_show, @trip_count_completed)}</span>) – {no_show()} food no show
               </div>
               <div class="ml-2">
-                + <span class="font-mono badge badge-neutral">{@trip_count_dropped_off}</span> ({dropped_off()} dropped off)
+                + <span class="font-mono badge badge-info">{@trip_count_dropped_off}</span>
+                (<span class="font-mono badge badge-info">{percentage(@trip_count_dropped_off, @trip_count_completed)}</span>) – {dropped_off()} dropped off
               </div>
               <div class="ml-2">
-                + <span class="font-mono badge badge-neutral">{@trip_count_handed_off}</span> ({handed_off()} handed off)
+                + <span class="font-mono badge badge-info">{@trip_count_handed_off}</span>
+                (<span class="font-mono badge badge-info">{percentage(@trip_count_handed_off, @trip_count_completed)}</span>) – {handed_off()} handed off
               </div>
             </div>
             <div class="ml-2">
-              ● paid: <span class="font-mono badge badge-neutral">{@trip_count_paid}</span>
+              ● paid:
+              <span class="font-mono badge badge-info">
+                {@trip_count_paid}
+              </span>
+              (<span class="font-mono badge badge-info">{percentage(@trip_count_paid, @trip_count_completed)}</span>)
             </div>
           </div>
         </div>
@@ -53,16 +60,37 @@ defmodule RsWeb.Live.Components.Analytics do
               name="hero-chevron-up"
               class="w-4 h-4 p-1"
             /> Detailed Analytics
+            <.icon
+              :if={not @view_analytics}
+              name="hero-chevron-down"
+              class="w-4 h-4 p-1 "
+            />
+            <.icon
+              :if={@view_analytics}
+              name="hero-chevron-up"
+              class="w-4 h-4 p-1"
+            />
           </div>
         </div>
 
-        <pre
-          :if={@view_analytics}
-          id="analytics-id"
-          class="border-1 p-3 bg-neutral rounded-md my-2 whitespace-pre-wrap break-words"
-        >{@analytics}</pre>
+        <div :if={@view_analytics}>
+          <div class="text-sm font-mono bg-base-100 w-full p-1">(refreshed on page reload)</div>
+          <pre
+            :if={@view_analytics}
+            id="analytics-id"
+            class="border-1 p-3 bg-neutral rounded-md my-2 whitespace-pre-wrap break-words"
+          >{@analytics}</pre>
+        </div>
       </div>
     </div>
     """
+  end
+
+  defp percentage(numerator, denominator) do
+    if denominator > 0 do
+      "#{round(numerator / denominator * 100)}%"
+    else
+      "N/A"
+    end
   end
 end
