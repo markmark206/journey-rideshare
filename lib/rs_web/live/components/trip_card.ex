@@ -99,9 +99,9 @@ defmodule RsWeb.Live.Components.TripCard do
                 <% i == @trip_values.location_driver and i == @trip_values.location_dropoff and @trip_values.dropped_off -> %>
                   <span class="font-mono text-lg">📦</span>
                 <% i <= @trip_values.location_driver -> %>
-                  <span class="font-mono text-success">_</span>
+                  <span class="font-mono text-success">●</span>
                 <% true  -> %>
-                  <span class="font-mono">.</span>
+                  <span class="font-mono">○</span>
               <% end %>
             <% end %>
           </div>
