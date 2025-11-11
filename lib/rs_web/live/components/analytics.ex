@@ -52,7 +52,7 @@ defmodule RsWeb.Live.Components.Analytics do
               <span class="font-mono badge badge-info">
                 {@trip_count_paid}
               </span>
-              / <span class="font-mono badge badge-info">{percentage(@trip_count_paid, @trip_count_completed)}</span>
+              / <span class="font-mono">{percentage(@trip_count_paid, @trip_count_completed)}</span>
             </div>
           </div>
         </div>
