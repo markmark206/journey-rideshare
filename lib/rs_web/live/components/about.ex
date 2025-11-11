@@ -6,12 +6,9 @@ defmodule RsWeb.Live.Components.About do
   def render(assigns) do
     ~H"""
     <div id="about-service-id" class="mx-auto max-w-2xl flex justify-center px-3">
-      <div class="text-sm justify-center font-mono border-1 rounded-md mt-3 p-4 bg-base-100 w-full">
+      <div class="text-sm justify-center font-mono border-1 rounded-md my-1 p-4 bg-base-100 w-full">
         <div class="py-1">
-          This is a dashboard for the play-demo JourDash Delivery service.
-        </div>
-        <div class="py-1">
-          The service is built with
+          This play-demo service is built with
           <a
             class="link link-primary"
             target="_blank"
@@ -25,7 +22,7 @@ defmodule RsWeb.Live.Components.About do
             href="https://www.phoenixframework.org/"
           >Phoenix LiveView</a>, with
           <a class="link link-primary" target="_blank" href="https://hexdocs.pm/journey/">hexdocs.pm/journey</a>
-          providing durable executions, with persistence, scheduling, crash recovery, and orchestration.
+          providing durable executions, with persistence, scheduling, crash recovery, orchestration and analytics.
         </div>
         <div class="py-1">
           JourDash source is available on Github:

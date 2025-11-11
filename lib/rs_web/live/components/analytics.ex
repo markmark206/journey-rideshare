@@ -7,10 +7,10 @@ defmodule RsWeb.Live.Components.Analytics do
   def render(assigns) do
     ~H"""
     <div id="trips-summary-analytics-id" class="mx-auto max-w-2xl flex justify-center px-3">
-      <div class="text-sm font-mono border-1 rounded-md mt-3 p-4 bg-base-100 w-full">
+      <div class="text-sm font-mono border-1 rounded-md mt-1 px-4 py-2 bg-base-100 w-full">
         <div class="py-1">
           <div>
-            JourDash Deliveries
+            Deliveries
           </div>
           <div id="deliveries-analytics-id" class="font-mono py-2">
             <div class="">
@@ -56,11 +56,11 @@ defmodule RsWeb.Live.Components.Analytics do
             </div>
           </div>
         </div>
-        <div class="pt-2 text-center">
+        <div class="text-center">
           <div
             id="form-show-analytics-id"
             phx-click="on-toggle-view-analytics-click"
-            class="hover:bg-info p-2 rounded-md"
+            class="hover:bg-info p-1 rounded-md"
           >
             <.icon
               :if={not @view_analytics}

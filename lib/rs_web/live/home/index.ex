@@ -249,8 +249,9 @@ defmodule RsWeb.Live.Home.Index do
   def render(assigns) do
     ~H"""
     <div>
-      <div class="mx-auto max-w-2xl space-y-6">
-        <div :if={@connected?} class="space-y-4">
+      <div class="mx-auto max-w-2xl space-y-2">
+        <div :if={@connected?} class="space-y-2">
+          <div class="text-2xl py-1 px-3 mt-2 text-center font-bold">JourDash Delivery Service</div>
           <RsWeb.Live.Components.Analytics.render
             trip_count_in_progress={@trip_count_in_progress}
             trip_count_completed={@trip_count_completed}
