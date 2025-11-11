@@ -48,7 +48,7 @@ defmodule RsWeb.Live.Components.Analytics do
               </div>
             </div>
             <div class="">
-              ● paid:
+              ● payment received:
               <span class="font-mono badge badge-info">
                 {@trip_count_paid}
               </span>

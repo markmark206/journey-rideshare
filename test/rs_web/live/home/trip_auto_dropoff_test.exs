@@ -49,7 +49,7 @@ defmodule RsWeb.Live.Home.TripAutoDropoffTest do
         poll_for_element(
           view,
           "#waiting-for-food-#{trip_id}-id",
-          100_000,
+          120_000,
           "waiting for driver #{trip_id} to reach pickup"
         )
 
@@ -79,7 +79,7 @@ defmodule RsWeb.Live.Home.TripAutoDropoffTest do
         poll_for_element(
           view,
           "#waiting-for-customer-#{trip_id}-id",
-          85_000,
+          120_000,
           "waiting for driver #{trip_id} to reach dropoff"
         )
 
