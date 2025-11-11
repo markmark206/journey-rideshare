@@ -1,6 +1,8 @@
 defmodule RsWeb.Live.Home.TripCompletionTest do
-  use RsWeb.ConnCase, async: true
+  # To avoid multiple OS elixir processes processing each others' executions and sending PubSub notifications that do not reach other OS processes, run these as async: false.
+  use RsWeb.ConnCase, async: false
   import Phoenix.LiveViewTest
+  import RsWeb.LiveViewTestHelpers
   require Logger
 
   @moduletag :integration
@@ -187,33 +189,6 @@ defmodule RsWeb.Live.Home.TripCompletionTest do
       assert completion_html =~ "✅"
 
       Logger.info("Test completed successfully - trip #{trip_id} completed with successful delivery")
-    end
-  end
-
-  # Helper: Poll for an element to appear within a timeout period
-  # Returns true if element appears, false if timeout is reached
-  defp poll_for_element(view, element_id, timeout_ms, description) do
-    deadline = System.monotonic_time(:millisecond) + timeout_ms
-    poll_for_element_until(view, element_id, deadline, description)
-  end
-
-  defp poll_for_element_until(view, element_id, deadline, description) do
-    now = System.monotonic_time(:millisecond)
-
-    if now >= deadline do
-      Logger.warning("Timeout reached while #{description}")
-      false
-    else
-      # Trigger a render to get latest state from the LiveView
-      render(view)
-
-      if has_element?(view, element_id) do
-        true
-      else
-        # Poll every 500ms
-        Process.sleep(500)
-        poll_for_element_until(view, element_id, deadline, description)
-      end
     end
   end
 end
