@@ -23,25 +23,25 @@ defmodule RsWeb.Live.Components.Analytics do
             </div>
             <div id="completed-details-analytics-id" class="">
               <div class="ml-2">
-                <span class="font-mono badge badge-info">{@trip_count_food_no_show}</span>
+                <span class="font-mono">{@trip_count_food_no_show}</span>
                 /
-                <span id="food-no-show-percentage-id" class="font-mono badge badge-info">
+                <span id="food-no-show-percentage-id" class="font-mono">
                   {percentage(@trip_count_food_no_show, @trip_count_completed)}
                 </span>
                 – {no_show()} food no show
               </div>
               <div class="ml-2">
-                <span class="font-mono badge badge-info">{@trip_count_dropped_off}</span>
+                <span class="font-mono">{@trip_count_dropped_off}</span>
                 /
-                <span id="dropped-off-percentage-id" class="font-mono badge badge-info">
+                <span id="dropped-off-percentage-id" class="font-mono">
                   {percentage(@trip_count_dropped_off, @trip_count_completed)}
                 </span>
                 – {dropped_off()} dropped off
               </div>
               <div class="ml-2">
-                <span class="font-mono badge badge-info">{@trip_count_handed_off}</span>
+                <span class="font-mono">{@trip_count_handed_off}</span>
                 /
-                <span id="handed-off-percentage-id" class="font-mono badge badge-info">
+                <span id="handed-off-percentage-id" class="font-mono">
                   {percentage(@trip_count_handed_off, @trip_count_completed)}
                 </span>
                 – {handed_off()} handed off
