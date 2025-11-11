@@ -10,41 +10,53 @@ defmodule RsWeb.Live.Components.Analytics do
       <div class="text-sm font-mono border-1 rounded-md mt-3 p-4 bg-base-100 w-full">
         <div class="py-1">
           <div>
-            Deliveries:
+            JourDash Deliveries
           </div>
-          <div>
-            <div class="ml-2">
+          <div id="deliveries-analytics-id" class="font-mono py-2">
+            <div class="">
               <span :if={@trip_count_in_progress > 0} class="status status-success animate-pulse"></span>
               <span :if={@trip_count_in_progress <= 0} class="">●</span>
               in progress: <span class="font-mono badge badge-info">{@trip_count_in_progress}</span>
             </div>
-            <div class="ml-2">
+            <div class="">
               ● completed: <span class="font-mono badge badge-info">{@trip_count_completed}</span>
             </div>
-            <div class="ml-2">
+            <div id="completed-details-analytics-id" class="">
               <div class="ml-2">
-                + <span class="font-mono badge badge-info">{@trip_count_food_no_show}</span>
-                (<span class="font-mono badge badge-info">{percentage(@trip_count_food_no_show, @trip_count_completed)}</span>) – {no_show()} food no show
+                <span class="font-mono">{@trip_count_food_no_show}</span>
+                /
+                <span id="food-no-show-percentage-id" class="font-mono">
+                  {percentage(@trip_count_food_no_show, @trip_count_completed)}
+                </span>
+                – {no_show()} food no show
               </div>
               <div class="ml-2">
-                + <span class="font-mono badge badge-info">{@trip_count_dropped_off}</span>
-                (<span class="font-mono badge badge-info">{percentage(@trip_count_dropped_off, @trip_count_completed)}</span>) – {dropped_off()} dropped off
+                <span class="font-mono">{@trip_count_dropped_off}</span>
+                /
+                <span id="dropped-off-percentage-id" class="font-mono">
+                  {percentage(@trip_count_dropped_off, @trip_count_completed)}
+                </span>
+                – {dropped_off()} dropped off
               </div>
               <div class="ml-2">
-                + <span class="font-mono badge badge-info">{@trip_count_handed_off}</span>
-                (<span class="font-mono badge badge-info">{percentage(@trip_count_handed_off, @trip_count_completed)}</span>) – {handed_off()} handed off
+                <span class="font-mono">{@trip_count_handed_off}</span>
+                /
+                <span id="handed-off-percentage-id" class="font-mono">
+                  {percentage(@trip_count_handed_off, @trip_count_completed)}
+                </span>
+                – {handed_off()} handed off
               </div>
             </div>
-            <div class="ml-2">
+            <div class="">
               ● paid:
               <span class="font-mono badge badge-info">
                 {@trip_count_paid}
               </span>
-              (<span class="font-mono badge badge-info">{percentage(@trip_count_paid, @trip_count_completed)}</span>)
+              / <span class="font-mono">{percentage(@trip_count_paid, @trip_count_completed)}</span>
             </div>
           </div>
         </div>
-        <div class="pt-2">
+        <div class="pt-2 text-center">
           <div
             id="form-show-analytics-id"
             phx-click="on-toggle-view-analytics-click"
