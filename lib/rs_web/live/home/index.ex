@@ -251,7 +251,7 @@ defmodule RsWeb.Live.Home.Index do
     <div>
       <div class="mx-auto max-w-2xl space-y-2">
         <div :if={@connected?} class="space-y-2">
-          <div id="trips-summary-analytics-id" class="mx-auto max-w-2xl flex justify-center mt-2 px-3">
+          <div id="title-id" class="mx-auto max-w-2xl flex justify-center mt-2 px-3">
             <div class="text-xl text-center font-mono border-1 rounded-md mt-1 px-4 py-2 bg-base-100 w-full">
               <div class="py-1">JourDash Delivery Service</div>
             </div>
