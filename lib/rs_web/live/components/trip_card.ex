@@ -24,7 +24,9 @@ defmodule RsWeb.Live.Components.TripCard do
         id={"trip-card-inner-container-#{@trip}-id"}
         class={
           [section2_no_margin(), "relative"] ++
-            if @trip_values.trip_completed_at != nil, do: ["text-secondary-content/40"], else: [""]
+            if @trip_values.trip_completed_at != nil,
+              do: ["opacity-70", "dark:bg-base-300 bg-gray-200"],
+              else: [""]
         }
       >
         <h1 class="mb-2 pb-2 flex items-center">
@@ -36,32 +38,57 @@ defmodule RsWeb.Live.Components.TripCard do
             id={"running-status-#{@trip}-id"}
             class="ml-auto flex items-center gap-2"
           >
-            <span class="font-mono badge badge-neutral p-1 badge-lg">
-              <span>{@trip_values.item_to_deliver}</span>
-              <span class="status status-success mx-1 status-lg animate-pulse"></span>
-            </span>
+            <div class="dropdown dropdown-left inline-block">
+              <label tabindex="0">
+                <span class="font-mono badge badge-outline badge-success badge-xl">
+                  <span>{@trip_values.item_to_deliver}</span>
+                  <span class="status status-success mx-1 status-lg animate-pulse"></span>
+                </span>
+              </label>
+              <div tabindex="0" class="dropdown-content z-[1] p-3 shadow bg-base-200 rounded-box mb-1 min-w-[200px]">
+                <p class="text-sm text-left">Delivery in progress</p>
+              </div>
+            </div>
           </span>
           <span
             :if={@trip_values.trip_completed_at != nil and @trip_values.payment != nil}
             id={"completed-delivered-status-#{@trip}-id"}
             class="ml-auto flex items-center gap-2"
           >
-            <span class="font-mono badge badge-neutral badge-lg">
-              <span>{@trip_values.item_to_deliver}</span>
-              <span>✅</span>
-              <span>{format_time_ago(@last_updated_seconds_ago)} ago</span>
-            </span>
+            <div class="dropdown dropdown-top inline-block">
+              <label tabindex="0">
+                <span class="font-mono badge badge-neutral badge-lg">
+                  <span>{@trip_values.item_to_deliver}</span>
+                  <span>✅</span>
+                  <span>{format_time_ago(@last_updated_seconds_ago)} ago</span>
+                </span>
+              </label>
+              <div tabindex="0" class="dropdown-content z-[1] p-3 shadow bg-base-200 rounded-box mb-1 min-w-[200px]">
+                <p class="text-sm text-left">
+                  {@trip_values.item_to_deliver} delivered
+                </p>
+                <p class="text-sm text-left">💰 collected</p>
+              </div>
+            </div>
           </span>
           <span
             :if={@trip_values.trip_completed_at != nil and @trip_values.payment == nil}
             class="ml-auto flex items-center gap-2"
             id={"completed-not-delivered-status-#{@trip}-id"}
           >
-            <span class="font-mono badge badge-neutral badge-lg">
-              <span>{@trip_values.item_to_deliver}</span>
-              <span>❌</span>
-              <span>{format_time_ago(@last_updated_seconds_ago)} ago</span>
-            </span>
+            <div class="dropdown dropdown-left inline-block">
+              <label tabindex="0">
+                <span class="font-mono badge badge-neutral badge-lg">
+                  <span>{@trip_values.item_to_deliver}</span>
+                  <span>❌</span>
+                  <span>{format_time_ago(@last_updated_seconds_ago)} ago</span>
+                </span>
+              </label>
+              <div tabindex="0" class="dropdown-content z-[1] p-3 shadow bg-base-200 rounded-box mb-1 min-w-[200px]">
+                <p class="text-sm text-left">{@trip_values.item_to_deliver} not delivered</p>
+                <p class="text-sm text-left">not ready for pickup</p>
+              </div>
+            </div>
           </span>
         </h1>
         <div id={"trip-journey-container-#{@trip}-id"} class="font-mono my-1 py-2">

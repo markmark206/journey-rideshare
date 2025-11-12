@@ -276,11 +276,11 @@ defmodule RsWeb.Live.Home.Index do
               id="start-a-new-trip-button-id"
               disabled={not driver_available?}
               phx-click="on_start_trip_button_click"
-              class="btn btn-sm btn-primary p-4 m-3 w-full"
+              class="btn btn-lg btn-primary p-4 m-3 w-full"
             >
-              <span class="">
+              <span class="text-lg">
                 <span class={["text-lg p-2", driver_available? && "animate-pulse"]}>{@item_to_deliver}</span>
-                Start a New Delivery
+                <span>Start a New Delivery</span>
                 <span class={["text-lg p-2", driver_available? && "animate-pulse"]}>{@item_to_deliver}</span>
               </span>
               <span
@@ -299,7 +299,7 @@ defmodule RsWeb.Live.Home.Index do
           </div>
 
           <%= for trip <- @trips do %>
-            <div class={if trip == @newly_created_trip_id, do: "border-l-3 border-r-3 border-info", else: ""}>
+            <div class={if trip == @newly_created_trip_id, do: "border-l-5 border-r-5 border-info", else: ""}>
               {live_render(@socket, RsWeb.Live.Trip.Index,
                 id: "trip-lv-#{trip}",
                 session: %{"trip" => trip}
