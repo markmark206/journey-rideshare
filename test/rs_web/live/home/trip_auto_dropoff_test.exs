@@ -140,9 +140,11 @@ defmodule RsWeb.Live.Home.TripAutoDropoffTest do
 
       assert dropped_off_badge_html =~ "🏠", "Should show house emoji for drop-off"
 
+      values = trip_id |> Journey.load() |> Journey.values()
+
       # Step 15: Verify payment badge appears (payment should process even for drop-off)
       assert has_element?(view, "#payment-#{trip_id}-id"),
-             "Payment should be processed for dropped-off delivery"
+             "Payment should be processed for dropped-off delivery, values: #{inspect(values, pretty: true)}"
 
       payment_badge_html =
         view
