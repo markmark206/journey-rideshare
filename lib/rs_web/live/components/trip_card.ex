@@ -24,7 +24,9 @@ defmodule RsWeb.Live.Components.TripCard do
         id={"trip-card-inner-container-#{@trip}-id"}
         class={
           [section2_no_margin(), "relative"] ++
-            if @trip_values.trip_completed_at != nil, do: ["text-secondary-content/40"], else: [""]
+            if @trip_values.trip_completed_at != nil,
+              do: ["opacity-70", "dark:bg-base-300 bg-gray-200"],
+              else: [""]
         }
       >
         <h1 class="mb-2 pb-2 flex items-center">
@@ -38,7 +40,7 @@ defmodule RsWeb.Live.Components.TripCard do
           >
             <div class="dropdown dropdown-left inline-block">
               <label tabindex="0">
-                <span class="font-mono badge badge-neutral p-1 badge-lg">
+                <span class="font-mono badge badge-outline badge-success badge-xl">
                   <span>{@trip_values.item_to_deliver}</span>
                   <span class="status status-success mx-1 status-lg animate-pulse"></span>
                 </span>

@@ -90,7 +90,7 @@ defmodule RsWeb.Live.Components.Analytics do
           <pre
             :if={@view_analytics}
             id="analytics-id"
-            class="border-1 p-3 bg-neutral rounded-md my-2 whitespace-pre-wrap break-words"
+            class="border-1 p-3 rounded-md my-2 bg-base-200 whitespace-pre-wrap break-words"
           >{@analytics}</pre>
         </div>
       </div>
