@@ -1,5 +1,15 @@
 defmodule RS.Trip.Graph do
-  @moduledoc false
+  @moduledoc """
+  This module defines the workflow of a delivery trip as a Journey graph.
+
+  The trip workflow models: driving to pickup location → item pickup →
+  driving to destination → handoff/dropoff → payment.
+
+  See Journey docs: https://hexdocs.pm/journey/readme.html
+
+  Each trip is its own durable execution of the graph, handling persistence,
+  scheduling, horizontal scalability, orchestration, and crash recovery out of the box.
+  """
   import Journey.Node
   import Journey.Node.Conditions
   import Journey.Node.UpstreamDependencies
@@ -157,9 +167,7 @@ defmodule RS.Trip.Graph do
           &log_driving_to_dropoff/1
         ),
 
-        # Continuously polling for driver's location and updating `location_driver`.
-        # Here we are using a simulated "GPS" system that updates the driver's location every 5 seconds.
-        # TODO: move this out of the graph (into the "driver" graph) - have the driver's "GPS" provide the data.
+        # Continuously polling for driver's location and updating `location_driver` with simulated "GPS" data.
         tick_recurring(
           :driver_location_current_timer,
           unblocked_when({
