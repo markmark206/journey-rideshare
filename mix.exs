@@ -51,7 +51,7 @@ defmodule Rs.MixProject do
        github: "tailwindlabs/heroicons", tag: "v2.2.0", sparse: "optimized", app: false, compile: false, depth: 1},
       {:jason, "~> 1.2"},
       # {:journey, github: "markmark206/journey", branch: "main"},
-      {:journey, "~> 0.10.37"},
+      {:journey, "~> 0.10.38"},
       {:lazy_html, ">= 0.1.0", only: :test},
       {:nanoid, "~> 2.1.0"},
       {:phoenix, "~> 1.8.1"},
